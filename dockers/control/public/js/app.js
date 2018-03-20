@@ -58,11 +58,34 @@ app.controller('network', function ($scope) {
 // Produkttyp Verwaltung
 app.controller('ProductProduce', function ($scope, $http) {
     
-    $scope.product = {};
+    var product = {"name": "", "type": "", "type_id": "", "var": [], "step": [], "log": [], "status": 0, "location": null};
+    
+    $scope.product = product;
     $scope.types = [];
 
     // Gespeicherten Typen aus DB holen
-    $http.get('/api/producttype').then(function (res) {$scope.types = res.data;}, function () { showStandardError(); });
+    $http.get('/api/producttype').then(function (res) {$scope.types = res.data;}, function () { showError("Konnte Produkttypen nicht laden"); });
+
+    $scope.variables = [];
+    $scope.variables[0] = {"name":"","type":"","value":""};
+    
+    $scope.VarToggler = {opacity: 0.5};
+    
+    $scope.loadType = function (type) {
+        $scope.variables = type.var;
+        $scope.VarToggler.opacity = 1;
+        product.type_id = type._id;
+        product.var = type.var;
+        product.step = type.step;
+    };
+
+    $scope.saveForm = function () {
+        console.log(product);
+
+        $http.post('/api/product', product).then(
+                function () { showSuccess("Produkt \""+product.name+"\" gespeichert!"); }, 
+                function () { showStandardError(); });
+    }
 
 });
 // Produkttyp Verwaltung

@@ -31,6 +31,24 @@ MongoClient.connect(url, function (err, client) {
     var db = client.db(dbName);
     var collection = db.collection('producttypes');
 
+    // Neues Produkt erstellen
+    app.post('/api/product', function (req, res) {
+
+        var collection = db.collection('products');
+
+        collection.insert(req.body, function (err, records) {
+
+            if (err == null)
+                res.status(200);
+            else
+                res.status(500);
+
+            res.send("");
+        });
+        logger(req.body);
+    });
+
+    // Neuer Produkttyp erstellen
     app.post('/api/producttype', function (req, res) {
 
         var collection = db.collection('producttypes');
@@ -47,6 +65,7 @@ MongoClient.connect(url, function (err, client) {
         logger(req.body);
     });
     
+    // Produkttypen abfragen
     app.get('/api/producttype', function (req, res) {
 
         collection.find({}).toArray(function (err, result) {
@@ -64,6 +83,7 @@ MongoClient.connect(url, function (err, client) {
         });
     });
     
+    // Löschen eines Produkttypens
     app.delete('/api/producttype/:typeid', function (req, res) {
         
         logger("remove: "+req.params.typeid);

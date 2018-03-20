@@ -18,6 +18,35 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Produkttyp</label>
+                                        <select required="" class="form-control" ng-model="product.type">
+                                            <option value="" disabled="">Bitte wählen</option>
+                                            <option ng-repeat="type in types" ng-click="loadType(type)">{{type.name}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" ng-style="VarToggler">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Variablen</label></i>
+                                        <div class="row" ng-repeat="var in variables">
+                                            <div class="col-md-4">
+                                                <input class="form-control" required="" ng-model="var.name" placeholder="Name" value="{{var.name}}" type="text" disabled="">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <input class="form-control" required="" ng-model="var.type" placeholder="Typ" value="{{var.type}}" type="text" disabled="">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <input class="form-control" required="" ng-model="var.value" placeholder="Wert" value="" type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <button type="submit" class="btn btn-info btn-fill pull-right">Produzieren</button>
                             <div class="clearfix"></div>
                         </form>
