@@ -120,4 +120,6 @@ typings/
 
 # next.js build output
 .next
-/dockers/controlpanel/nbproject/private/
+
+# package-lock.json
+package-lock.json

@@ -1,14 +1,20 @@
 {
-"name": "control",
+        "name": "control",
         "version": "1.0.0",
-        "keywords": ["util", "functional", "server", "client", "browser"],
+        "keywords": [
+                "util",
+                "functional",
+                "server",
+                "client",
+                "browser"
+        ],
         "author": "Martin Weber",
         "contributors": [],
         "main": "server.js",
         "scripts": {
-        "start": "node server.js"
+                "start": "node server.js"
         },
         "dependencies": {
-            "express": "4.16.3"
+                "express": "4.16.3"
         }
 }
