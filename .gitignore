@@ -39,7 +39,7 @@ target/
 .project
 
 # NetBeans specific
-nbproject/private/
+nbproject/
 build/
 nbbuild/
 dist/
@@ -120,3 +120,4 @@ typings/
 
 # next.js build output
 .next
+/dockers/controlpanel/nbproject/private/
