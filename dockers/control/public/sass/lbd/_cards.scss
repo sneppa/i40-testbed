@@ -1,9 +1,10 @@
 .card{
     border-radius: $border-radius-base;
-    background-color: $white-color;
+    box-shadow: 0 1px 2px rgba(0,0,0,.05),0 0 0 1px rgba(63,63,68,.1);
+    background-color: #FFFFFF;
     margin-bottom: 30px;
-
-    .card-image{
+        
+    .image{
         width: 100%;
         overflow: hidden;
         height: 260px;
@@ -12,7 +13,7 @@
         -webkit-transform-style: preserve-3d;
         -moz-transform-style: preserve-3d;
         transform-style: preserve-3d;
-
+      
         img {
             width: 100%;
         }
@@ -26,9 +27,9 @@
         width: 100%;
         height: 100%;
         text-align: center;
-
+        
         @include opacity(0);
-
+        
         .btn{
             @include vertical-align();
         }
@@ -42,34 +43,31 @@
     &:hover .btn-hover{
         @include opacity(1);
     }
-    .card-body{
+    .content{
         padding: 15px 15px 10px 15px;
     }
-    .card-header{
+    .header{
         padding: 15px 15px 0;
-        background-color: $white-color;
-        border-bottom: none !important;
-
     }
-    .card-category,
+    .category,
     label{
         font-size: $font-size-base;
         font-weight: $font-weight-normal;
         color: $dark-gray;
         margin-bottom: 0px;
-
+        
         i{
             font-size: $font-paragraph;
         }
     }
-
+    
     label{
         font-size: $font-size-small;
         margin-bottom: 5px;
         text-transform: uppercase;
     }
 
-    .card-title{
+    .title{
         margin: $none;
         color: $black-color;
         font-weight: $font-weight-light;
@@ -85,17 +83,15 @@
         font-size: $font-size-base;
         color: #333;
     }
-    .card-footer{
-        padding-top: 0;
+    .footer{
+        padding: 0;
         background-color: $transparent-bg;
         line-height: 30px;
-        border-top: none !important;
-        font-size: 14px;
-
+        
         .legend{
             padding: 5px 0;
         }
-
+        
         hr{
             margin-top: 5px;
             margin-bottom: 5px;
@@ -104,7 +100,7 @@
     .stats{
         color: #a9a9a9;
     }
-    .card-footer div{
+    .footer div{
         display: inline-block;
     }
 
@@ -126,80 +122,41 @@
         top: 0;
         width: 1px;
         background-color: $medium-gray;
-        card-body: "";
+        content: "";
         position: absolute;
     }
-
+    
     .ct-chart{
         margin: 30px 0 30px;
         height: 245px;
     }
-
-    .ct-label{
-        font-size: 1rem !important;
-    }
-
+    
     .table{
         tbody td:first-child,
         thead th:first-child{
             padding-left: 15px;
         }
-
+        
         tbody td:last-child,
         thead th:last-child{
             padding-right: 15px;
-            display: inline-flex;
         }
     }
-
+    
     .alert{
         border-radius: $border-radius-base;
         position: relative;
-
+        
         &.alert-with-icon{
             padding-left: 65px;
         }
     }
 }
-
-
-
-.card-stats{
-    .card-body{
-        padding: 15px 15px 0px;
-
-        .numbers{
-            font-size: 1.8rem;
-            text-align: right;
-
-            p{
-                margin-bottom: 0;
-            }
-        }
-    }
-    .card-footer{
-        padding: 0px 15px 10px 15px;
-
-
-    }
-    .icon-big {
-        font-size: 3em;
-        min-height: 64px;
-
-        i{
-            font-weight: 700;
-            line-height: 59px;
-        }
-    }
-
-
-}
-
 .card-user{
-    .card-image{
+    .image{
         height: 110px;
     }
-    .card-image-plain{
+    .image-plain{
         height: 0;
         margin-top: 110px;
     }
@@ -214,7 +171,7 @@
         border: 5px solid #FFFFFF;
         position: relative;
         margin-bottom: 15px;
-
+        
         &.border-gray{
             border-color: #EEEEEE;
         }
@@ -222,14 +179,14 @@
     .title{
         line-height: 24px;
     }
-    .card-body{
+    .content{
         min-height: 240px;
     }
 }
 
 .card-user,
 .card-price{
-    .card-footer{
+    .footer{
         padding: 5px 15px 10px;
     }
     hr{
@@ -240,16 +197,11 @@
     background-color: transparent;
     box-shadow: none;
     border-radius: 0;
-
-    .card-image{
+    
+    .image{
         border-radius: 4px;
     }
 }
 
-.card.card-plain{
-    border: none !important;
 
-    .card-header{
-        background-color: transparent !important;
-    }
-}
+

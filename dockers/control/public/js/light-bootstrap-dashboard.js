@@ -1,7 +1,7 @@
 /*!
 
  =========================================================
- * Light Bootstrap Dashboard - v2.0.1
+ * Light Bootstrap Dashboard - v1.4.0
  =========================================================
 
  * Product Page: http://www.creative-tim.com/product/light-bootstrap-dashboard
@@ -21,98 +21,100 @@ var transparentDemo = true;
 var fixedTop = false;
 
 var navbar_initialized = false;
-var mobile_menu_visible = 0,
-    mobile_menu_initialized = false,
-    toggle_initialized = false,
-    bootstrap_nav_initialized = false,
-    $sidebar,
-    isWindows;
 
-$(document).ready(function() {
+$(document).ready(function(){
     window_width = $(window).width();
 
     // check if there is an image set for the sidebar's background
     lbd.checkSidebarImage();
 
     // Init navigation toggle for small screens
-    if (window_width <= 991) {
-        lbd.initRightMenu();
-    }
+    lbd.initRightMenu();
 
     //  Activate the tooltips
     $('[rel="tooltip"]').tooltip();
 
-    //      Activate regular switches
-    if ($("[data-toggle='switch']").length != 0) {
-        $("[data-toggle='switch']").bootstrapSwitch();
-    }
-
-    $('.form-control').on("focus", function() {
+    $('.form-control').on("focus", function(){
         $(this).parent('.input-group').addClass("input-group-focus");
-    }).on("blur", function() {
+    }).on("blur", function(){
         $(this).parent(".input-group").removeClass("input-group-focus");
     });
 
     // Fixes sub-nav not working as expected on IOS
-    $('body').on('touchstart.dropdown', '.dropdown-menu', function(e) {
-        e.stopPropagation();
-    });
+$('body').on('touchstart.dropdown', '.dropdown-menu', function (e) { e.stopPropagation(); });
 });
 
-// activate collapse right menu when the windows is resized
-$(window).resize(function() {
-    if ($(window).width() <= 991) {
+$(document).on('click', '.navbar-toggle', function(){
+    $toggle = $(this);
+
+    if(lbd.misc.navbar_menu_visible == 1) {
+        $('html').removeClass('nav-open');
+       lbd.misc.navbar_menu_visible = 0;
+        $('#bodyClick').remove();
+        setTimeout(function(){
+           $toggle.removeClass('toggled');
+       }, 550);
+    } else {
+       setTimeout(function(){
+           $toggle.addClass('toggled');
+       }, 580);
+       div = '<div id="bodyClick"></div>';
+       $(div).appendTo('body').click(function() {
+           $('html').removeClass('nav-open');
+           lbd.misc.navbar_menu_visible = 0;
+            setTimeout(function(){
+               $toggle.removeClass('toggled');
+               $('#bodyClick').remove();
+            }, 550);
+       });
+
+      $('html').addClass('nav-open');
+       lbd.misc.navbar_menu_visible = 1;
+    }
+});
+
+$(window).on('resize', function(){
+    if(navbar_initialized){
         lbd.initRightMenu();
+        navbar_initialized = true;
     }
 });
 
 lbd = {
-    misc: {
+    misc:{
         navbar_menu_visible: 0
     },
-    checkSidebarImage: function() {
+
+    checkSidebarImage: function(){
         $sidebar = $('.sidebar');
         image_src = $sidebar.data('image');
 
-        if (image_src !== undefined) {
+        if(image_src !== undefined){
             sidebar_container = '<div class="sidebar-background" style="background-image: url(' + image_src + ') "/>'
             $sidebar.append(sidebar_container);
-        } else if (mobile_menu_initialized == true) {
-            // reset all the additions that we made for the sidebar wrapper only if the screen is bigger than 991px
-            $sidebar_wrapper.find('.navbar-form').remove();
-            $sidebar_wrapper.find('.nav-mobile-menu').remove();
-
-            mobile_menu_initialized = false;
         }
     },
 
-    initRightMenu: function() {
-        $sidebar_wrapper = $('.sidebar-wrapper');
+    initRightMenu: debounce(function(){
+        if(!navbar_initialized){
+            $sidebar_wrapper = $('.sidebar-wrapper');
+            $navbar = $('nav').find('.navbar-collapse').html();
 
-        if (!mobile_menu_initialized) {
-
-            $navbar = $('nav').find('.navbar-collapse').first().clone(true);
-
-            nav_content = '';
             mobile_menu_content = '';
 
-            //add the content from the regular header to the mobile menu
-            $navbar.children('ul').each(function() {
-
-                content_buff = $(this).html();
-                nav_content = nav_content + content_buff;
-            });
+            nav_content = $navbar;
 
             nav_content = '<ul class="nav nav-mobile-menu">' + nav_content + '</ul>';
 
-            $navbar_form = $('nav').find('.navbar-form').clone(true);
+            // navbar_form = $('nav').find('.navbar-form').get(0).outerHTML;
 
             $sidebar_nav = $sidebar_wrapper.find(' > .nav');
 
             // insert the navbar form before the sidebar list
             $nav_content = $(nav_content);
+            // $navbar_form = $(navbar_form);
             $nav_content.insertBefore($sidebar_nav);
-            $navbar_form.insertBefore($nav_content);
+            // $navbar_form.insertBefore($nav_content);
 
             $(".sidebar-wrapper .dropdown .dropdown-menu > li > a").click(function(event) {
                 event.stopPropagation();
@@ -121,69 +123,16 @@ lbd = {
 
             mobile_menu_initialized = true;
         } else {
-            console.log('window with:' + $(window).width());
-            if ($(window).width() > 991) {
+            if($(window).width() > 991){
                 // reset all the additions that we made for the sidebar wrapper only if the screen is bigger than 991px
-                $sidebar_wrapper.find('.navbar-form').remove();
+                // $sidebar_wrapper.find('.navbar-form').remove();
                 $sidebar_wrapper.find('.nav-mobile-menu').remove();
 
                 mobile_menu_initialized = false;
             }
         }
-
-        if (!toggle_initialized) {
-            $toggle = $('.navbar-toggler');
-
-            $toggle.click(function() {
-
-                if (mobile_menu_visible == 1) {
-                    $('html').removeClass('nav-open');
-
-                    $('.close-layer').remove();
-                    setTimeout(function() {
-                        $toggle.removeClass('toggled');
-                    }, 400);
-
-                    mobile_menu_visible = 0;
-                } else {
-                    setTimeout(function() {
-                        $toggle.addClass('toggled');
-                    }, 430);
-
-
-                    main_panel_height = $('.main-panel')[0].scrollHeight;
-                    $layer = $('<div class="close-layer"></div>');
-                    $layer.css('height', main_panel_height + 'px');
-                    $layer.appendTo(".main-panel");
-
-                    setTimeout(function() {
-                        $layer.addClass('visible');
-                    }, 100);
-
-                    $layer.click(function() {
-                        $('html').removeClass('nav-open');
-                        mobile_menu_visible = 0;
-
-                        $layer.removeClass('visible');
-
-                        setTimeout(function() {
-                            $layer.remove();
-                            $toggle.removeClass('toggled');
-
-                        }, 400);
-                    });
-
-                    $('html').addClass('nav-open');
-                    mobile_menu_visible = 1;
-
-                }
-            });
-
-            toggle_initialized = true;
-        }
-    }
+    },200)
 }
-
 
 
 // Returns a function, that, as long as it continues to be invoked, will not
@@ -192,15 +141,14 @@ lbd = {
 // leading edge, instead of the trailing.
 
 function debounce(func, wait, immediate) {
-    var timeout;
-    return function() {
-        var context = this,
-            args = arguments;
-        clearTimeout(timeout);
-        timeout = setTimeout(function() {
-            timeout = null;
-            if (!immediate) func.apply(context, args);
-        }, wait);
-        if (immediate && !timeout) func.apply(context, args);
-    };
+	var timeout;
+	return function() {
+		var context = this, args = arguments;
+		clearTimeout(timeout);
+		timeout = setTimeout(function() {
+			timeout = null;
+			if (!immediate) func.apply(context, args);
+		}, wait);
+		if (immediate && !timeout) func.apply(context, args);
+	};
 };
