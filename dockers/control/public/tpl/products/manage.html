@@ -10,7 +10,7 @@
                         <p class="category">Alle Produktarten, aus denen Produkte erstellt werden können</p>
                     </div>
                     <div class="content table-responsive table-full-width">
-                        <table class="table table-hover table-striped">
+                        <table class="table table-hover table-striped" ng-controller="ProductManage">
                             <thead>
                                 <tr><th>ID</th>
                                     <th>Name</th>
@@ -19,7 +19,7 @@
                                     <th>City</th>
                                 </tr></thead>
                             <tbody>
-                                <tr>
+                                <tr ng-repeat="type in types">
                                     <td>1</td>
                                     <td>Dakota Rice</td>
                                     <td>$36,738</td>
