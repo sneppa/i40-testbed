@@ -29,31 +29,41 @@ MongoClient.connect(url, function (err, client) {
     assert.equal(null, err);
     logger("Connected successfully to mongoDB server");
     var db = client.db(dbName);
-    var collection = db.collection('producttypes');
+    var producttypes = db.collection('producttypes');
+    var products = db.collection('products');
 
     // Neues Produkt erstellen
     app.post('/api/product', function (req, res) {
-
-        var collection = db.collection('products');
-
-        collection.insert(req.body, function (err, records) {
-
+        products.insert(req.body, function (err, records) {
             if (err == null)
                 res.status(200);
             else
                 res.status(500);
-
             res.send("");
         });
         logger(req.body);
     });
+    
+    // Produkte abfragen
+    app.get('/api/product', function (req, res) {
+        products.find({}).toArray(function (err, result) {
+            if (err == null)
+            {
+                res.status(200);
+                res.send(result);
+            } else
+            {
+                res.status(500);
+                res.send("");
+            }
+            logger("Queried Product");
+            logger(result);
+        });
+    });
 
     // Neuer Produkttyp erstellen
     app.post('/api/producttype', function (req, res) {
-
-        var collection = db.collection('producttypes');
-
-        collection.insert(req.body, function (err, records) {
+        producttypes.insert(req.body, function (err, records) {
 
             if (err == null)
                 res.status(200);
@@ -67,8 +77,7 @@ MongoClient.connect(url, function (err, client) {
     
     // Produkttypen abfragen
     app.get('/api/producttype', function (req, res) {
-
-        collection.find({}).toArray(function (err, result) {
+        producttypes.find({}).toArray(function (err, result) {
             if (err == null)
             {
                 res.status(200);
@@ -85,10 +94,8 @@ MongoClient.connect(url, function (err, client) {
     
     // Löschen eines Produkttypens
     app.delete('/api/producttype/:typeid', function (req, res) {
-        
         logger("remove: "+req.params.typeid);
-        
-        collection.remove({"_id": new mongodb.ObjectID(req.params.typeid)}, function (err, result) {
+        producttypes.remove({"_id": new mongodb.ObjectID(req.params.typeid)}, function (err, result) {
             if (err == null)
                 res.status(200);
             else

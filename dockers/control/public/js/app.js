@@ -55,7 +55,21 @@ app.controller('network', function ($scope) {
 
 // ------------------------------- Products
 
-// Produkttyp Verwaltung
+// Produkt Übersicht
+app.controller('ProductOverview', function ($scope, $http) {
+    
+    $scope.products = [];
+
+    // Gespeicherten Typen aus DB holen
+    $http.get('/api/product').then(
+                function (res) {
+                    $scope.products = res.data;
+                }, 
+                function () { showStandardError(); });
+                
+});
+
+// Produkt produzieren lassen
 app.controller('ProductProduce', function ($scope, $http) {
     
     var product = {"name": "", "type": "", "type_id": "", "var": [], "step": [], "log": [], "status": 0, "location": null};
@@ -88,6 +102,7 @@ app.controller('ProductProduce', function ($scope, $http) {
     }
 
 });
+
 // Produkttyp Verwaltung
 app.controller('ProductManage', function ($scope, $http) {
     
