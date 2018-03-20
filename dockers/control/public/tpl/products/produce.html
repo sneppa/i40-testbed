@@ -1,3 +1,29 @@
 <ng-include src="'tpl/products/nav.html'"></ng-include>
 
-<div class="content">Produzieren</div>
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="header">
+                        <h4 class="title">Produkt produzieren</h4>
+                    </div>
+                    <div class="content">
+                        <form ng-controller="ProductProduce" ng-submit="saveForm()">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Produktname</label>
+                                        <input required="" class="form-control" ng-model="product.name" name="productname" placeholder="Produktname" value="" type="text">
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-info btn-fill pull-right">Produzieren</button>
+                            <div class="clearfix"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

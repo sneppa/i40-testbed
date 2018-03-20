@@ -55,7 +55,44 @@ app.controller('network', function ($scope) {
 
 // ------------------------------- Products
 
+// Produkttyp Verwaltung
+app.controller('ProductProduce', function ($scope, $http) {
+    
+    $scope.product = {};
+    $scope.types = [];
+
+    // Gespeicherten Typen aus DB holen
+    $http.get('/api/producttype').then(function (res) {$scope.types = res.data;}, function () { showStandardError(); });
+
+});
+// Produkttyp Verwaltung
 app.controller('ProductManage', function ($scope, $http) {
+    
+    $scope.types = [];
+
+    // Gespeicherten Typen aus DB holen
+    $http.get('/api/producttype').then(
+                function (res) {
+                    $scope.types = res.data;
+                }, 
+                function () { showStandardError(); });
+                
+    // Löschen Funktion
+    $scope.deleteType = function (id) { 
+        
+        console.log("Delete: "+'/api/producttype/'+id);
+        
+        $http.delete('/api/producttype/'+id).then(
+                function (res) {
+                    $scope.types.forEach(function (item, index, object) {
+                        if (item._id == id)
+                            object.splice(index, 1);
+                    })
+                    showSuccess("Produkttyp gelöscht!");
+                }, 
+                function () { showStandardError(); });
+    
+    };
 
 });
 
@@ -89,15 +126,11 @@ app.controller('ProductAdd', function ($scope, $http) {
         console.log($scope.productart);
 
         $http.post('/api/producttype', $scope.productart).then(
-                function () { console.log("Gespeichert"); showSuccess("Produkttyp \""+$scope.productart.name+"\" gespeichert!"); }, 
-                function () { console.log("Fehler"); showStandardError(); });
+                function () { showSuccess("Produkttyp \""+$scope.productart.name+"\" gespeichert!"); }, 
+                function () { showStandardError(); });
     }
 
 });
-
-
-
-
 
 // ------------------------------- Notifications
 

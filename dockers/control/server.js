@@ -2,7 +2,8 @@
 
 var express = require("express");
 var bodyParser = require("body-parser");
-var MongoClient = require('mongodb').MongoClient;
+var mongodb = require('mongodb');
+var MongoClient = mongodb.MongoClient;
 var assert = require('assert');
 var app = express();
 var logger;
@@ -28,6 +29,7 @@ MongoClient.connect(url, function (err, client) {
     assert.equal(null, err);
     logger("Connected successfully to mongoDB server");
     var db = client.db(dbName);
+    var collection = db.collection('producttypes');
 
     app.post('/api/producttype', function (req, res) {
 
@@ -44,9 +46,8 @@ MongoClient.connect(url, function (err, client) {
         });
         logger(req.body);
     });
+    
     app.get('/api/producttype', function (req, res) {
-
-        var collection = db.collection('producttypes');
 
         collection.find({}).toArray(function (err, result) {
             if (err == null)
@@ -58,9 +59,24 @@ MongoClient.connect(url, function (err, client) {
                 res.status(500);
                 res.send("");
             }
-            console.log(result);
+            logger("Queried Producttypes");
+            logger(result);
         });
     });
+    
+    app.delete('/api/producttype/:typeid', function (req, res) {
+        
+        logger("remove: "+req.params.typeid);
+        
+        collection.remove({"_id": new mongodb.ObjectID(req.params.typeid)}, function (err, result) {
+            if (err == null)
+                res.status(200);
+            else
+                res.status(500);
+
+            res.send("");
+        });
+    })
 
 });
 
