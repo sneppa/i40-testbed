@@ -1,5 +1,7 @@
 # i40-testbed
-Components for a Industrie 4.0 Testbed Prototype
+Components for an Industrie 4.0 Testbed Prototype.
+
+Concept and prototype described in https://github.com/sneppa/thesis-template
 
 Components:
 - Control Interface
