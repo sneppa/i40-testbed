@@ -12,6 +12,15 @@ app.config(function($routeProvider) {
 	}).when('/products', {
 		templateUrl: 'tpl/products.html',
 		controller: 'products',
+	}).when('/products/produce', {
+		templateUrl: 'tpl/products/produce.html',
+		controller: 'products',
+	}).when('/products/add', {
+		templateUrl: 'tpl/products/add.html',
+		controller: 'products',
+	}).when('/products/manage', {
+		templateUrl: 'tpl/products/manage.html',
+		controller: 'products',
 	}).when('/network', {
 		templateUrl: 'tpl/network.html',
 		controller: 'network',
@@ -41,5 +50,38 @@ app.controller('products', function($scope) {
 
 app.controller('network', function($scope) {
 //    $scope.nav.title = "Netzwerk";
+    
+});
+
+
+app.controller('ProductAdd', function ($scope, $templateCache) {
+    
+    var productart = {};
+    productart.name = "";
+    productart.step = [];
+    productart.var = [];
+    $scope.productart = productart;
+    
+    var unitFields = 0;
+    $scope.productart.step = [];
+    $scope.productart.step[0] = {"index": 0, "name": ""};
+    
+    $scope.addUnit = function () {
+        unitFields++;
+        $scope.productart.step[unitFields] = {"index": unitFields, "name": ""};
+    }
+    
+    var varFields = 0;
+    $scope.productart.var = [];
+    $scope.productart.var[0] = {"index": 0, "name": "", "type": "String"};
+    
+    $scope.addVar = function () {
+        varFields++;
+        $scope.productart.var[varFields] = {"index": varFields, "name": "", "type": "String"};
+    }
+    
+    $scope.saveForm = function () {
+        console.log($scope.productart);
+    }
     
 });

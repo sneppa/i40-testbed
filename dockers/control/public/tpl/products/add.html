@@ -1,0 +1,64 @@
+<ng-include src="'tpl/products/nav.html'"></ng-include>
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="header">
+                        <h4 class="title">Produktart hinzufügen</h4>
+                    </div>
+                    <div class="content">
+                        <form ng-controller="ProductAdd" ng-submit="saveForm()">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Produktart</label>
+                                        <input required="" class="form-control" ng-model="productart.name" name="productname" placeholder="Produktname" value="" type="text">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Produktionsschritte</label>
+                                        <div class="row" ng-repeat="field in productart.step">
+                                            <div class="col-md-12">
+                                                <input class="form-control" required="" ng-model="field.name" name="steps[{{field.index}}]" placeholder="{{field.index+1}}. Produktionsschritt" value="" type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Variablen</label></i>
+                                        <div class="row" ng-repeat="field in productart.var">
+                                            <div class="col-md-6">
+                                                <input class="form-control" required="" ng-model="field.name" placeholder="Name" value="" type="text">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <select ng-model="field.type" class="form-control">
+                                                    <option>String</option>
+                                                    <option>Float</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-info btn-fill pull-right">Produktart erstellen</button>
+                            <div class="btn btn-primary btn-sm" ng-click="addVar()">Variable hinzufügen</div>
+                            <div class="btn btn-primary btn-sm" ng-click="addUnit()">Produktionsschritt hinzufügen</div>
+                            <div class="clearfix"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
