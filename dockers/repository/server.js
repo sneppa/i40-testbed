@@ -231,6 +231,7 @@ function toEnum(text)
             break;
         case "FLOAT":
             return opcua.DataType.Float;
+            break;
         case "INT16":
             return opcua.DataType.Int16;
             break;

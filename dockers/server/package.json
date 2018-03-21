@@ -1,5 +1,5 @@
 {
-    "name": "repository",
+    "name": "server",
     "version": "1.0.0",
     "keywords": [
         "util",
@@ -11,10 +11,6 @@
     "author": "Martin Weber",
     "contributors": [],
     "dependencies": {
-        "express": "4.16.3",
-        "mongodb": "3.0.4",
-        "assert": "1.4.1",
-        "body-parser": "1.18.2",
         "node-opcua": "~0.2.0"
     }
 }
