@@ -4,8 +4,8 @@ var config = require('./config');
 var express = require("express");
 var bodyParser = require("body-parser");
 var mongodb = require('mongodb');
-var MongoClient = mongodb.MongoClient;
 var assert = require('assert');
+var MongoClient = mongodb.MongoClient;
 var app = express();
 var logger;
 
@@ -20,11 +20,11 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 // Cross Origin
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
 });
 
 // App bereitstellen
@@ -113,6 +113,11 @@ MongoClient.connect(url, function (err, client) {
             res.send("");
         });
     })
+
+    // Repository abfragen
+    app.get('/api/repository', function (req, res) {
+        res.send(config.repository);
+    });
 
     // Repository abfragen
     app.get('/api/repository', function (req, res) {
