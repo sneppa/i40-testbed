@@ -135,9 +135,11 @@ function addOpcUaProductServer(product)
             productName: product.name,
             buildNumber: "1",
             buildDate: product.buildDate > 0 ? Date(product.date) : Date(),
-            productUri: "PRODUCT_" + product._id
         }
     });
+    
+    server.serverInfo.applicationUri = "urn:PRODUCT_" + product._id;
+    server.serverInfo.productUri = "PRODUCT_" + product._id;
 
     logger("Add Product Server: " + product.name + ":" + portcounter);
 
@@ -146,6 +148,13 @@ function addOpcUaProductServer(product)
     server.initialize(function () {
         logger("Init Product Server: " + product.name);
         initializeAddressspace(product, server);
+
+        if (config.discovery.enabled)
+        {
+            server.registerServer(config.discovery.url, function () {
+                console.log("Registered Server to "+config.discovery.url);
+            });
+        }
 
         // we can now start the server
         server.start(function () {
@@ -174,10 +183,13 @@ function initializeAddressspace(product, server)
     product.var.forEach(function (variable) {
         addVarToAdressspace(addressSpace, folder, variable, product);
     });
+    
+    console.log(product._id);
 
     // Hinterlegen der standardisierten Werte:
     addVarToAdressspace(addressSpace, folder, {name: "status", type: "Int16", value: product.status}, product);
     addVarToAdressspace(addressSpace, folder, {name: "location", type: "String", value: product.location}, product);
+    addVarToAdressspace(addressSpace, folder, {name: "idproduct", type: "String", value: "ID: "+product._id}, product);
 
     var steps = addressSpace.addFolder(folder, {browseName: "Step"});
     var stepcounter = 0;
@@ -295,7 +307,17 @@ function toEnum(text)
 function stopOpcUaProductServer(productid)
 {
     logger(("Server gestoppt: " + productid).yellow);
-    opcServers[productid].shutdown(function () {});
+    
+
+    if (config.discovery.enabled)
+    {
+        opcServers[productid].unregisterServer(config.discovery.url, function () {
+            console.log("Unregistered Server from "+config.discovery.url);
+            opcServers[productid].shutdown(function () {});
+        });
+    }
+    else
+        opcServers[productid].shutdown(function () {});
 }
 
 /**

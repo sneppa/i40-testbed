@@ -2,8 +2,12 @@ var config = require('./config');
 var opcua = require("node-opcua");
 
 var server = new opcua.OPCUAServer({
-    port: config.port // the port of the listening socket of the server
+    port: config.port, // the port of the listening socket of the server
+    buildInfo: { productName: config.productName }
 });
+server.serverInfo.applicationUri = config.applicationUri;
+server.serverInfo.productUri = config.productUri; 
+//server.serverInfo.discoveryUrls = ["empty"];
 
 function post_initialize() {
 
@@ -53,8 +57,30 @@ function post_initialize() {
 
 server.initialize(post_initialize);
 
+if (config.discovery.enabled)
+{
+    server.registerServer(config.discovery.url, function () {
+        console.log("Registered Server ("+server._get_endpoints()[0].endpointUrl+") to "+config.discovery.url);
+    });
+}
+
 server.start(function () {
     console.log("Server is now listening ... ( press CTRL+C to stop)");
+    console.log(server._get_endpoints()[0].endpointUrl);
+});
+
+process.on('SIGINT', function() {
+    if (config.discovery.enabled)
+    {
+        server.unregisterServer(config.discovery.url, function () {
+            console.log("Unregistered Server ("+server._get_endpoints()[0].endpointUrl+") from "+config.discovery.url);
+            server.shutdown(function () { console.log("Server herunterfahren"); });
+        });
+    }
+    else
+    {
+        server.shutdown(function () { console.log("Server herunterfahren"); });
+    }
 });
 
 /**

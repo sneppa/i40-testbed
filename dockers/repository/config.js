@@ -2,6 +2,10 @@ config = {};
 
 config.port = 8090; // Port des API Servers
 
+config.discovery = {};
+config.discovery.url = 'opc.tcp://localhost:4840'; // URL zum Discovery Server
+config.discovery.enabled = true; // Discovery Server an/aus schalten
+
 // MongoDB Einstellungen
 config.db = {};
 config.db.url = 'mongodb://localhost:27017';
