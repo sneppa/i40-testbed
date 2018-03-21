@@ -8,8 +8,8 @@ Components:
 - [Discovery Server](https://github.com/sneppa/i40-testbed/tree/master/dockers/discovery)
 - [Repository](https://github.com/sneppa/i40-testbed/tree/master/dockers/repository)
 - [Configurable Active I4.0 Component](https://github.com/sneppa/i40-testbed/tree/master/dockers/server)
-- PKI & Identity Provider
 - Configurable Active I4.0 Component Forwarder
+- PKI & Identity Provider
 
 Implemented with:
 - [NodeJS](https://github.com/nodejs)
