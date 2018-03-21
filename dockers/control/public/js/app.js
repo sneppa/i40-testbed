@@ -1,5 +1,6 @@
 //define a global application
 var app = angular.module('App', ['ngRoute']);
+var repositoryUrl = "";
 
 //create an app router for url management and redirect
 app.config(function ($routeProvider) {
@@ -29,7 +30,7 @@ app.config(function ($routeProvider) {
     });
     $routeProvider.otherwise({redirectTo: '/dashboard'});
 });
-
+   
 app.controller('nav', function ($scope) {
 //    $scope.title = "Dashboard";
 });
@@ -43,14 +44,12 @@ app.controller('server', function ($scope) {
 
 });
 
-app.controller('products', function ($scope) {
-//    $scope.nav.title = "Produkte";
-
+app.controller('products', function ($scope, $http) {
+//    $scope.nav.title = "Produkte"; 
 });
 
 app.controller('network', function ($scope) {
 //    $scope.nav.title = "Netzwerk";
-
 });
 
 // ------------------------------- Products
@@ -60,13 +59,16 @@ app.controller('ProductOverview', function ($scope, $http) {
     
     $scope.products = [];
 
+
     // Gespeicherten Typen aus DB holen
-    $http.get('/api/product').then(
+    loadRepoUrl($http, $scope, function ($http, $scope) {
+        showInfo("Lade Produkte von "+repositoryUrl+'/product');
+        $http.get(repositoryUrl+'/product').then(
                 function (res) {
                     $scope.products = res.data;
                 }, 
-                function () { showStandardError(); });
-                
+                function (err) { showError("Konnte Produkte nicht in Repository lesen!"); console.log(err); });
+    });      
 });
 
 // Produkt produzieren lassen
@@ -96,9 +98,9 @@ app.controller('ProductProduce', function ($scope, $http) {
     $scope.saveForm = function () {
         console.log(product);
 
-        $http.post('/api/product', product).then(
+        $http.post(repositoryUrl+'/product', product).then(
                 function () { showSuccess("Produkt \""+product.name+"\" gespeichert!"); }, 
-                function () { showStandardError(); });
+                function () { showError("Konnte Produkt nicht in Repository speichern!"); });
     }
 
 });
@@ -172,6 +174,10 @@ app.controller('ProductAdd', function ($scope, $http) {
 
 // ------------------------------- Notifications
 
+function showInfo(text)
+{
+    showNotification("info", "info", text);
+}
 function showSuccess(text)
 {
     showNotification("check", "success", text);
@@ -198,4 +204,17 @@ function showNotification(icon, type, text){
 			align: "right"
 		}
 	});
+}
+
+function logger(text)
+{
+    console.log(text);
+}
+
+function loadRepoUrl($http, $scope, callback)
+{
+    if (repositoryUrl == "")
+        $http.get('/api/repository').then(function (res) {repositoryUrl = res.data; logger("Loaded repo URL: "+repositoryUrl); callback($http, $scope);}, function () { showError("Repository URL konnte nicht geladen werden"); });
+    else
+        callback($http, $scope);
 }

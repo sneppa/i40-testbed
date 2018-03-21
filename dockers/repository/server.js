@@ -23,6 +23,16 @@ MongoClient.connect(url, function (err, client) {
     logger("Connected successfully to mongoDB server");
 
     var db = client.db(dbName);
+
+    // BodyParsergeschiss
+    app.use(bodyParser.urlencoded({extended: true}));
+    app.use(bodyParser.json());
+    // Cross Origin
+    app.use(function(req, res, next) {
+      res.header("Access-Control-Allow-Origin", "*");
+      res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+      next();
+    });
     
     if (config.demo)
     {
@@ -58,12 +68,16 @@ MongoClient.connect(url, function (err, client) {
     app.post('/api/product', function (req, res) {
         products.insert(req.body, function (err, records) {
             if (err == null)
+            {
+                logger("Produkt gespeichert: "+req.body.name);
+                if (records.ops[0] != null)
+                    addOpcUaProductServer(records.ops[0]);
                 res.status(200);
+            }
             else
                 res.status(500);
             res.send("");
         });
-        logger(req.body);
     });
 });
 
