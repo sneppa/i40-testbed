@@ -1,0 +1,16 @@
+{
+    "name": "discovery",
+    "version": "1.0.0",
+    "keywords": [
+        "util",
+        "functional",
+        "server",
+        "client",
+        "browser"
+    ],
+    "author": "Martin Weber",
+    "contributors": [],
+    "dependencies": {
+        "node-opcua": "~0.2.0"
+    }
+}
