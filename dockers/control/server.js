@@ -22,6 +22,7 @@ app.use(bodyParser.json());
 // Cross Origin
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
@@ -96,7 +97,7 @@ MongoClient.connect(url, function (err, client) {
                 res.send("");
             }
             logger("Queried Producttypes");
-            logger(result);
+//            logger(result);
         });
     });
 

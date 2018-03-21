@@ -14,6 +14,17 @@ var portcounter = config.product.startPort;
 var url = config.db.url;
 var dbName = config.demo ? 'demorepo' : config.db.name;
 
+// BodyParsergeschiss
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
+// Cross Origin
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+    
 logger("Server beenden mit CTRL + C".red);
 
 MongoClient.connect(url, function (err, client) {
@@ -23,16 +34,6 @@ MongoClient.connect(url, function (err, client) {
     logger("Connected successfully to mongoDB server");
 
     var db = client.db(dbName);
-
-    // BodyParsergeschiss
-    app.use(bodyParser.urlencoded({extended: true}));
-    app.use(bodyParser.json());
-    // Cross Origin
-    app.use(function(req, res, next) {
-      res.header("Access-Control-Allow-Origin", "*");
-      res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-      next();
-    });
     
     if (config.demo)
     {
@@ -59,10 +60,24 @@ MongoClient.connect(url, function (err, client) {
                 res.status(500);
                 res.send("");
             }
-            logger("Queried Product");
-            logger(result);
+            logger("Queried Products");
         });
     });
+
+    // Produkte löschen
+    app.delete('/api/product/:productid', function (req, res) {
+        logger("remove: " + req.params.productid);
+        products.remove({"_id": new mongodb.ObjectID(req.params.productid)}, function (err, result) {
+            if (err == null)
+            {
+                stopOpcUaProductServer(req.params.productid);
+                res.status(200);
+            }
+            else
+                res.status(500);
+            res.send("");
+        });
+    })
 
     // Neues Produkt erstellen
     app.post('/api/product', function (req, res) {
@@ -220,6 +235,17 @@ function toEnum(text)
             return opcua.DataType.Int16;
             break;
     }
+}
+
+/**
+ * Stopt den angegbenen Server
+ * @param {Integer} productid
+ * @returns {undefined}
+ */
+function stopOpcUaProductServer(productid)
+{
+    logger(("Server gestoppt: "+productid).yellow);
+    opcServers[productid].shutdown(function () {});
 }
 
 /**

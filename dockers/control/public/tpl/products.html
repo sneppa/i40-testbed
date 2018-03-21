@@ -33,8 +33,11 @@
                                             <span class="btn btn-success btn-sm btn-round" title="löschen" ng-click="startProduct(product._id)"><i class="pe-7s-play"></i></span>
                                         </span>
                                         <span ng-if="product.status > 0">
-                                            <span class="btn btn-danger btn-sm btn-round" title="löschen" ng-click="deleteProduct(product._id)"><i class="pe-7s-trash"></i></span>
-                                        </span></td>
+                                            <span class="btn btn-warning btn-sm btn-round" title="löschen" ng-click="stopProduct(product._id)"><i class="pe-7s-power"></i></span>
+                                        </span>
+                                        
+                                        <span class="btn btn-danger btn-sm btn-round" title="löschen" ng-click="deleteProduct(product._id)"><i class="pe-7s-trash"></i></span>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>

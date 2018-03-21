@@ -30,7 +30,7 @@ app.config(function ($routeProvider) {
     });
     $routeProvider.otherwise({redirectTo: '/dashboard'});
 });
-   
+
 app.controller('nav', function ($scope) {
 //    $scope.title = "Dashboard";
 });
@@ -56,37 +56,66 @@ app.controller('network', function ($scope) {
 
 // Produkt Übersicht
 app.controller('ProductOverview', function ($scope, $http) {
-    
+
     $scope.products = [];
 
 
     // Gespeicherten Typen aus DB holen
     loadRepoUrl($http, $scope, function ($http, $scope) {
-        showInfo("Lade Produkte von "+repositoryUrl+'/product');
-        $http.get(repositoryUrl+'/product').then(
+        showInfo("Lade Produkte von " + repositoryUrl + '/product');
+        $http.get(repositoryUrl + '/product').then(
                 function (res) {
                     $scope.products = res.data;
-                }, 
-                function (err) { showError("Konnte Produkte nicht in Repository lesen!"); console.log(err); });
-    });      
+                },
+                function (err) {
+                    showError("Konnte Produkte nicht in Repository lesen!");
+                    console.log(err);
+                });
+    });
+
+
+    // Löschen Funktion
+    $scope.deleteProduct = function (id) {
+
+        loadRepoUrl($http, $scope, function ($http, $scope) {
+//            showInfo("Delete: " + repositoryUrl + '/product/' + id);
+
+            $http.delete(repositoryUrl + '/product/' + id).then(
+                    function (res) {
+                        $scope.products.forEach(function (item, index, object) {
+                            if (item._id == id)
+                                object.splice(index, 1);
+                        })
+                        showSuccess("Produkt gelöscht!");
+                    },
+                    function () {
+                        showStandardError();
+                    });
+        });
+
+    };
 });
 
 // Produkt produzieren lassen
 app.controller('ProductProduce', function ($scope, $http) {
-    
+
     var product = {"name": "", "type": "", "type_id": "", "var": [], "step": [], "log": [], "status": 0, "location": null};
-    
+
     $scope.product = product;
     $scope.types = [];
 
     // Gespeicherten Typen aus DB holen
-    $http.get('/api/producttype').then(function (res) {$scope.types = res.data;}, function () { showError("Konnte Produkttypen nicht laden"); });
+    $http.get('/api/producttype').then(function (res) {
+        $scope.types = res.data;
+    }, function () {
+        showError("Konnte Produkttypen nicht laden");
+    });
 
     $scope.variables = [];
-    $scope.variables[0] = {"name":"","type":"","value":""};
-    
+    $scope.variables[0] = {"name": "", "type": "", "value": ""};
+
     $scope.VarToggler = {opacity: 0.5};
-    
+
     $scope.loadType = function (type) {
         $scope.variables = type.var;
         $scope.VarToggler.opacity = 1;
@@ -98,40 +127,48 @@ app.controller('ProductProduce', function ($scope, $http) {
     $scope.saveForm = function () {
         console.log(product);
 
-        $http.post(repositoryUrl+'/product', product).then(
-                function () { showSuccess("Produkt \""+product.name+"\" gespeichert!"); }, 
-                function () { showError("Konnte Produkt nicht in Repository speichern!"); });
+        $http.post(repositoryUrl + '/product', product).then(
+                function () {
+                    showSuccess("Produkt \"" + product.name + "\" gespeichert!");
+                },
+                function () {
+                    showError("Konnte Produkt nicht in Repository speichern!");
+                });
     }
 
 });
 
 // Produkttyp Verwaltung
 app.controller('ProductManage', function ($scope, $http) {
-    
+
     $scope.types = [];
 
     // Gespeicherten Typen aus DB holen
     $http.get('/api/producttype').then(
-                function (res) {
-                    $scope.types = res.data;
-                }, 
-                function () { showStandardError(); });
-                
+            function (res) {
+                $scope.types = res.data;
+            },
+            function () {
+                showStandardError();
+            });
+
     // Löschen Funktion
-    $scope.deleteType = function (id) { 
-        
-        console.log("Delete: "+'/api/producttype/'+id);
-        
-        $http.delete('/api/producttype/'+id).then(
+    $scope.deleteType = function (id) {
+
+        console.log("Delete: " + '/api/producttype/' + id);
+
+        $http.delete('/api/producttype/' + id).then(
                 function (res) {
                     $scope.types.forEach(function (item, index, object) {
                         if (item._id == id)
                             object.splice(index, 1);
                     })
                     showSuccess("Produkttyp gelöscht!");
-                }, 
-                function () { showStandardError(); });
-    
+                },
+                function () {
+                    showStandardError();
+                });
+
     };
 
 });
@@ -166,8 +203,12 @@ app.controller('ProductAdd', function ($scope, $http) {
         console.log($scope.productart);
 
         $http.post('/api/producttype', $scope.productart).then(
-                function () { showSuccess("Produkttyp \""+$scope.productart.name+"\" gespeichert!"); }, 
-                function () { showStandardError(); });
+                function () {
+                    showSuccess("Produkttyp \"" + $scope.productart.name + "\" gespeichert!");
+                },
+                function () {
+                    showStandardError();
+                });
     }
 
 });
@@ -191,19 +232,19 @@ function showStandardError()
     showNotification("close-circle", "danger", "Fehler aufgetreten!");
 }
 
-function showNotification(icon, type, text){
-	$.notify({
-		icon: "pe-7s-"+icon,
-		message: text
+function showNotification(icon, type, text) {
+    $.notify({
+        icon: "pe-7s-" + icon,
+        message: text
 
-	},{
-		type: type,
-		timer: 4000,
-		placement: {
-			from: "bottom",
-			align: "right"
-		}
-	});
+    }, {
+        type: type,
+        timer: 4000,
+        placement: {
+            from: "bottom",
+            align: "right"
+        }
+    });
 }
 
 function logger(text)
@@ -214,7 +255,13 @@ function logger(text)
 function loadRepoUrl($http, $scope, callback)
 {
     if (repositoryUrl == "")
-        $http.get('/api/repository').then(function (res) {repositoryUrl = res.data; logger("Loaded repo URL: "+repositoryUrl); callback($http, $scope);}, function () { showError("Repository URL konnte nicht geladen werden"); });
+        $http.get('/api/repository').then(function (res) {
+            repositoryUrl = res.data;
+            logger("Loaded repo URL: " + repositoryUrl);
+            callback($http, $scope);
+        }, function () {
+            showError("Repository URL konnte nicht geladen werden");
+        });
     else
         callback($http, $scope);
 }

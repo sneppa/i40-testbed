@@ -4,10 +4,14 @@ config.port = 8080; // Port des API Servers
 
 // MongoDB Einstellungen
 config.db = {};
-config.db.url = 'mongodb://localhost:27017';
+config.db.url = 'mongodb://localhost:27017'; // Started with: node
+//config.db.url = 'mongodb://localhost:27017'; // Started with: docker
 config.db.name = 'interface';
 
-config.repository = 'http://localhost:8090/api'; // URL zur Repository API
+// URL zur Repository API
+config.repository = 'http://localhost:8090/api'; // Started with: node
+//config.repository = 'http://localhost:8090/api'; // Started with: docker
+//config.repository = 'http://localhost:8090/api'; // Started with: kubernetes
 
 config.demo = true; // @TODO Datenbank wird automatisch gefüllt.
 
