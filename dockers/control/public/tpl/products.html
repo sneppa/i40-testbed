@@ -28,7 +28,13 @@
                                     <td><span class="btn btn-default btn-sm btn-round" ng-repeat="var in product.var">{{var.name}}: ({{var.value}})</span></td>
                                     <td>{{product.location}}</td>
                                     <td>{{product.status}}</td>
-                                    <td></td>
+                                    <td>
+                                        <span ng-if="product.status == 0">
+                                            <span class="btn btn-success btn-sm btn-round" title="löschen" ng-click="startProduct(product._id)"><i class="pe-7s-play"></i></span>
+                                        </span>
+                                        <span ng-if="product.status > 0">
+                                            <span class="btn btn-danger btn-sm btn-round" title="löschen" ng-click="deleteProduct(product._id)"><i class="pe-7s-trash"></i></span>
+                                        </span></td>
                                 </tr>
                             </tbody>
                         </table>
