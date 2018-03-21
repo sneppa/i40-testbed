@@ -10,3 +10,9 @@ Components:
 - PKI & Identity Provider
 - Configurable Active I4.0 Component
 - Configurable Active I4.0 Component Forwarder
+
+Implemented with:
+- [NodeJS](https://github.com/nodejs)
+- [MongoDB](https://github.com/mongodb)
+- [AngularJS](https://github.com/angular)
+- [NodeOPCUA](https://github.com/node-opcua)

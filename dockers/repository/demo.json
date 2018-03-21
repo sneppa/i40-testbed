@@ -1,0 +1,41 @@
+{
+    "products":
+            [
+                {
+                    "_id": "5ab1469e9568f719ac63f215",
+                    "name": "BILLY Regal",
+                    "type": "Schrank",
+                    "type_id": "5ab13ec5fd6af110a8e4255f",
+                    "var": [{
+                            "name": "Teile",
+                            "type": "Float",
+                            "value": "20"
+                        },
+                        {
+                            "name": "Breite",
+                            "type": "Float",
+                            "value": "2.2"
+                        },
+                        {
+                            "name": "Höhe",
+                            "type": "Float",
+                            "value": "4"
+                        }
+                    ],
+                    "step": [{
+                            "step": 1,
+                            "name": "Zuschneiden"
+                        }, {
+                            "step": 2,
+                            "name": "Schleifen"
+                        }, {
+                            "step": 3,
+                            "name": "Verpacken"
+                        }],
+                    "log": [],
+                    "status": 0,
+                    "location": "non - existent",
+                    "buildDate": "2012-04-23T18:25:43.511Z"
+                }
+            ]
+}
