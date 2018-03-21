@@ -13,18 +13,19 @@ var portcounter = config.product.startPort;
 
 var url = config.db.url;
 var dbName = config.demo ? 'demorepo' : config.db.name;
+var db = null;
 
 // BodyParsergeschiss
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 // Cross Origin
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
 });
-    
+
 logger("Server beenden mit CTRL + C".red);
 
 MongoClient.connect(url, function (err, client) {
@@ -33,19 +34,18 @@ MongoClient.connect(url, function (err, client) {
 
     logger("Connected successfully to mongoDB server");
 
-    var db = client.db(dbName);
-    
+    db = client.db(dbName);
+
     if (config.demo)
     {
         initDemoDatabase(db);
-    }
-    else
+    } else
     {
         app.listen(config.port, function () {
             initServer(db);
         });
     }
-    
+
     var products = db.collection('products');
 
     // Produkte abfragen
@@ -72,8 +72,7 @@ MongoClient.connect(url, function (err, client) {
             {
                 stopOpcUaProductServer(req.params.productid);
                 res.status(200);
-            }
-            else
+            } else
                 res.status(500);
             res.send("");
         });
@@ -84,12 +83,11 @@ MongoClient.connect(url, function (err, client) {
         products.insert(req.body, function (err, records) {
             if (err == null)
             {
-                logger("Produkt gespeichert: "+req.body.name);
+                logger("Produkt gespeichert: " + req.body.name);
                 if (records.ops[0] != null)
                     addOpcUaProductServer(records.ops[0]);
                 res.status(200);
-            }
-            else
+            } else
                 res.status(500);
             res.send("");
         });
@@ -114,7 +112,7 @@ function initProductsInDatabase(db)
 {
     var products = db.collection('products');
     products.find({}).toArray(function (err, result) {
-        logger("Objekte aus Datenbank: "+result.length);
+        logger("Objekte aus Datenbank: " + result.length);
         if (err == null)
             result.forEach(function (item) {
                 addOpcUaProductServer(item);
@@ -137,7 +135,7 @@ function addOpcUaProductServer(product)
             productName: product.name,
             buildNumber: "1",
             buildDate: product.buildDate > 0 ? Date(product.date) : Date(),
-            productUri: "PRODUCT_"+product._id
+            productUri: "PRODUCT_" + product._id
         }
     });
 
@@ -148,11 +146,11 @@ function addOpcUaProductServer(product)
     server.initialize(function () {
         logger("Init Product Server: " + product.name);
         initializeAddressspace(product, server);
-        
+
         // we can now start the server
         server.start(function () {
             var endpointUrl = server.endpoints[0].endpointDescriptions()[0].endpointUrl;
-            logger(("Product Server is now listening ("+server.buildInfo.productName+": "+endpointUrl+")").green);
+            logger(("Product Server is now listening (" + server.buildInfo.productName + ": " + endpointUrl + " - ID: " + server.buildInfo.productUri + ")").green);
 //            server.endpoints[0].endpointDescriptions().forEach(function (endpoint) {
 //                console.log(endpoint.endpointUrl, endpoint.securityMode.toString(), endpoint.securityPolicyUri.toString());
 //            });
@@ -174,21 +172,22 @@ function initializeAddressspace(product, server)
 
     // Hinterlegen der produktspezifischen Variablen
     product.var.forEach(function (variable) {
-        addVarToAdressspace(addressSpace, folder, variable);
+        addVarToAdressspace(addressSpace, folder, variable, product);
     });
-    
+
     // Hinterlegen der standardisierten Werte:
-    addVarToAdressspace(addressSpace, folder, {name: "status", type: "Int16", value: product.status});
-    addVarToAdressspace(addressSpace, folder, {name: "location", type:"String", value: product.location});
-    
+    addVarToAdressspace(addressSpace, folder, {name: "status", type: "Int16", value: product.status}, product);
+    addVarToAdressspace(addressSpace, folder, {name: "location", type: "String", value: product.location}, product);
+
     var steps = addressSpace.addFolder(folder, {browseName: "Step"});
     var stepcounter = 0;
     product.step.forEach(function (step) {
-        addVarToAdressspace(addressSpace, steps, {name: "step-"+stepcounter, type:"String", value: step.name});
+//        console.log(step.name);
+        addStepToAdressspace(addressSpace, steps, stepcounter, step.name);
         stepcounter++;
     });
-    
-//    addVarToAdressspace(addressSpace, folder, {name: "", type:"String", value: ""});
+
+//    addVarToAdressspace(addressSpace, folder, {name: "", type:"String", value: ""}, product);
 
 }
 
@@ -199,21 +198,71 @@ function initializeAddressspace(product, server)
  * @param {type} variable
  * @returns {undefined}
  */
-function addVarToAdressspace(addressSpace, folder, variable)
+function addVarToAdressspace(addressSpace, folder, variable, product)
 {
+    var getMethod = function () {
+        return new opcua.Variant({dataType: toEnum(variable.type), value: variable.value});
+    };
+
+    var setMethod = null;
+
+    setMethod = function (variant) {
+        logger("changed: " + variable.name + " (" + product._id + ")");
+        variable.value = variant.value;
+
+        // Produkt Objekt aktualiseren vorm speichern
+        if (variable.name == "location")
+            product.location = variant.value;
+        else if (variable.name == "status")
+            product.status = variant.value;
+        else
+        {
+            product.var.forEach(function (cvar) {
+                if (cvar.name == variable.name)
+                    cvar.value = variant.value;
+            })
+        }
+
+        // Datenbank aktualisieren
+        var newvalues = {$set: product};
+        console.log(newvalues);
+        db.collection("products").update({"_id": new mongodb.ObjectID(product._id)}, newvalues, function (err, res) {
+            if (err == null)
+            {
+                logger("Wert gespeichert".green);
+                logger(res.result);
+            } else
+                logger("Fehler bei Wert speichern".red);
+        });
+
+        return opcua.StatusCodes.Good;
+    }
+
 //    logger(variable.name + " (" + variable.type + "): " + variable.value);
     addressSpace.addVariable({
         componentOf: folder,
         browseName: variable.name,
         dataType: variable.type,
         value: {
-            get: function () {
-                return new opcua.Variant({dataType: toEnum(variable.type), value: variable.value});
-            },
-            set: function (variant) {
-                variable.value = variant.value;
-                return opcua.StatusCodes.Good;
-            }
+            get: getMethod,
+            set: setMethod
+        }
+    });
+}
+
+function addStepToAdressspace(addressSpace, folder, stepnr, name)
+{
+//    console.log("add step");
+    var getMethod = function () {
+        return new opcua.Variant({dataType: opcua.DataType.String, value: name});
+    };
+//    logger(variable.name + " (" + variable.type + "): " + variable.value);
+    addressSpace.addVariable({
+        componentOf: folder,
+        browseName: "step-"+stepnr,
+        dataType: "String",
+        value: {
+            get: getMethod
         }
     });
 }
@@ -245,7 +294,7 @@ function toEnum(text)
  */
 function stopOpcUaProductServer(productid)
 {
-    logger(("Server gestoppt: "+productid).yellow);
+    logger(("Server gestoppt: " + productid).yellow);
     opcServers[productid].shutdown(function () {});
 }
 
@@ -265,16 +314,16 @@ function logger(text)
 function initDemoDatabase(db)
 {
     db.dropDatabase();
-    
+
     var products = db.collection('products');
     var demo = require('./demo');
-    
+
     products.insert(demo.products, function (err, records) {
         if (err == null)
             console.log("Inserted Demo Products");
         else
             console.log("Error Insert Demo Products");
-        
+
         app.listen(config.port, function () {
             initServer(db);
         });
