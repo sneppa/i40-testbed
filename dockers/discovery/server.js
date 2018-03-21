@@ -4,8 +4,6 @@ var OPCUADiscoveryServer = require("node-opcua-server-discovery").OPCUADiscovery
 var OPCUAServer = opcua.OPCUAServer;
 var OPCUAClient = opcua.OPCUAClient;
 
-
-var server;
 var discovery_server, discovery_server_endpointUrl;
 
 discovery_server = new OPCUADiscoveryServer({port: 4840});
