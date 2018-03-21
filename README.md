@@ -27,15 +27,17 @@ The testbed can be used only with nodejs, with docker and with kubernetes
 
 ``$ mongod``
 
-2. Start Servers
+2. Start Discovery
+
+``$ nodejs /dockers/discovery/server.js``
+
+3. Start Servers
 
 ``$ nodejs /dockers/repository/server.js``
 
 ``$ nodejs /dockers/control/server.js``
 
-``$ nodejs /dockers/discovery/server.js``
-
-3. Start OPC UA Active Servers (for each server)
+4. Start OPC UA Active Servers (for each server)
 
 ``$ nodejs /dockers/server/server.js``
 
