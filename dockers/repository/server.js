@@ -369,10 +369,7 @@ function initDemoDatabase(db)
  * Safe Shutdown with unregister
  */
 process.on('SIGINT', function () {
-    console.log("Stop Server");
-
-    console.log(config.discovery);
-
+    console.log("Stop Server".red);
     opcServersIds.forEach(function (id, index) {
         var callback = function () {};
         if (index == opcServersIds.length - 1)
