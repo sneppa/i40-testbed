@@ -7,8 +7,8 @@ Components:
 - [Control Interface](https://github.com/sneppa/i40-testbed/tree/master/dockers/control)
 - [Discovery Server](https://github.com/sneppa/i40-testbed/tree/master/dockers/discovery)
 - [Repository](https://github.com/sneppa/i40-testbed/tree/master/dockers/repository)
-- PKI & Identity Provider
 - [Configurable Active I4.0 Component](https://github.com/sneppa/i40-testbed/tree/master/dockers/server)
+- PKI & Identity Provider
 - Configurable Active I4.0 Component Forwarder
 
 Implemented with:
