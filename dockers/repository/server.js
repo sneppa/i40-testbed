@@ -178,7 +178,7 @@ function addOpcUaProductServer(product)
 function initializeAddressspace(product, server)
 {
     var addressSpace = server.engine.addressSpace;
-    var folder = addressSpace.addFolder("ObjectsFolder", {browseName: "Product"});
+    var folder = addressSpace.addFolder("ObjectsFolder", {browseName: "Product", nodeId: "ns=1;s=Product"});
 
     // Hinterlegen der produktspezifischen Variablen
     product.var.forEach(function (variable) {
@@ -261,6 +261,7 @@ function addVarToAdressspace(addressSpace, folder, variable, product)
     addressSpace.addVariable({
         componentOf: folder,
         browseName: variable.name,
+        nodeId: "ns=1;s="+toUri(variable.name),
         dataType: variable.type,
         value: {
             get: getMethod,
@@ -279,6 +280,7 @@ function addStepToAdressspace(addressSpace, folder, stepnr, name)
     addressSpace.addVariable({
         componentOf: folder,
         browseName: "step-" + stepnr,
+        nodeId: "ns=1;s=step" + stepnr,
         dataType: "String",
         value: {
             get: getMethod
@@ -344,6 +346,24 @@ function stopOpcUaProductServer(productid, callback)
         });
     } else
         opcServers[productid].shutdown(callback);
+}
+
+/**
+ * Entfernt unerlaubte Zeichen für den Identifier bei OPC UA
+ * @param {String} text
+ * @returns {String}
+ */
+function toUri(text)
+{
+    text = text.replace(" ", "_");
+    text = text.replace("ö", "oe");
+    text = text.replace("Ö", "Oe");
+    text = text.replace("ä", "ae");
+    text = text.replace("Ä", "ae");
+    text = text.replace("ü", "ae");
+    text = text.replace("Ü", "_");
+    
+    return text;
 }
 
 /**

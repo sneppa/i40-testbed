@@ -3,6 +3,7 @@ var mUtil = require("../functions/db_connector.js");
 
 var product_methods = [{description: {
             browseName: "setStatus",
+            nodeId: "ns=1;s=setStatus",
             inputArguments: [
                 {
                     name: "step",

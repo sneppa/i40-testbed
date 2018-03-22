@@ -3,7 +3,7 @@ var opcua = require("node-opcua");
 var async = require("async");
 
 var client = new opcua.OPCUAClient();
-var endpointUrl = "opc.tcp://PIQUADRAT:30000";
+var endpointUrl = "opc.tcp://localhost:30000";
 var makeBrowsePath = opcua.makeBrowsePath;
 var session;
 var nodeId;
