@@ -4,16 +4,13 @@ var config = require('./config');
 var opcua = require("node-opcua");
 var express = require('express');
 var bodyParser = require("body-parser");
-var mongodb = require('mongodb');
-var MongoClient = mongodb.MongoClient;
+var mUtil = require("./functions/db_connector");
 var assert = require('assert');
 var app = express();
 var opcServers = [];
 var opcServersIds = [];
 var portcounter = config.product.startPort;
 
-var url = config.db.url;
-var dbName = config.demo ? 'demorepo' : config.db.name;
 var db = null;
 
 // BodyParsergeschiss
@@ -29,13 +26,14 @@ app.use(function (req, res, next) {
 
 logger("Server beenden mit CTRL + C".red);
 
-MongoClient.connect(url, function (err, client) {
+mUtil.connectToServer( function( err ) {
 
     assert.equal(null, err);
 
     logger("Connected successfully to mongoDB server");
 
-    db = client.db(dbName);
+    db = mUtil.getDb();
+//    console.log(db);
 
     if (config.demo)
     {
@@ -202,6 +200,8 @@ function initializeAddressspace(product, server)
         addStepToAdressspace(addressSpace, steps, stepcounter, step.name);
         stepcounter++;
     });
+    
+    addMethodsToAdressspace(addressSpace, folder, product);
 
 //    addVarToAdressspace(addressSpace, folder, {name: "", type:"String", value: ""}, product);
 
@@ -228,9 +228,11 @@ function addVarToAdressspace(addressSpace, folder, variable, product)
 
         // Produkt Objekt aktualiseren vorm speichern
         if (variable.name == "location")
-            product.location = variant.value;
+            product.location = variant.value; // Sollte für live raus
         else if (variable.name == "status")
-            product.status = variant.value;
+            product.status = variant.value; // Sollte für live raus
+        else if (variable.name == "currentStep")
+            product.currentStep = variant.value; // Sollte für live raus
         else
         {
             product.var.forEach(function (cvar) {
@@ -240,16 +242,17 @@ function addVarToAdressspace(addressSpace, folder, variable, product)
         }
 
         // Datenbank aktualisieren
-        var newvalues = {$set: product};
-        console.log(newvalues);
-        db.collection("products").update({"_id": new mongodb.ObjectID(product._id)}, newvalues, function (err, res) {
-            if (err == null)
-            {
-                logger("Wert gespeichert".green);
-                logger(res.result);
-            } else
-                logger("Fehler bei Wert speichern".red);
-        });
+        mUtil.updateProduct(product);
+//        var newvalues = {$set: product};
+//        console.log(newvalues);
+//        db.collection("products").update({"_id": new mongodb.ObjectID(product._id)}, newvalues, function (err, res) {
+//            if (err == null)
+//            {
+//                logger("Wert gespeichert".green);
+//                logger(res.result);
+//            } else
+//                logger("Fehler bei Wert speichern".red);
+//        });
 
         return opcua.StatusCodes.Good;
     }
@@ -280,6 +283,15 @@ function addStepToAdressspace(addressSpace, folder, stepnr, name)
         value: {
             get: getMethod
         }
+    });
+}
+
+function addMethodsToAdressspace(addressSpace, folder, product)
+{
+    var methods = require('./functions/product_methods');
+    methods.forEach(function (method) {
+        var amethod = addressSpace.addMethod(folder, method.description);
+        amethod.bindMethod(method.call);
     });
 }
 
