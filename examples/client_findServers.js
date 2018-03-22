@@ -21,13 +21,7 @@ async.series([
             console.log(servers);
             callback(err);
         });
-    },
-    function (callback) {
-        client.disconnect(function (err) {
-            callback(err);
-        });
     }
-
 ],
     function (err) {
         if (err) {
