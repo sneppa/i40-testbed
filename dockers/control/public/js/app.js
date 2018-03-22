@@ -87,7 +87,7 @@ app.controller('networkdiagram', function ($scope) {
 // ------------------------------- Products
 
 // Produkt Übersicht
-app.controller('ProductOverview', function ($scope, $http) {
+app.controller('ProductOverview', function ($scope, $http, $timeout, $route) {
 
     $scope.products = [];
 
@@ -95,6 +95,12 @@ app.controller('ProductOverview', function ($scope, $http) {
     // Gespeicherten Typen aus DB holen
     loadRepoUrl($http, $scope, function ($http, $scope) {
         showInfo("Lade Produkte von " + repositoryUrl + '/product');
+        reloader();
+    });
+    
+    var reloader = function () {
+        // 0 ms delay to reload the page.
+//        $route.reload();
         $http.get(repositoryUrl + '/product').then(
                 function (res) {
                     $scope.products = res.data;
@@ -103,8 +109,9 @@ app.controller('ProductOverview', function ($scope, $http) {
                     showError("Konnte Produkte nicht in Repository lesen!");
                     console.log(err);
                 });
-    });
-
+                
+        $timeout(reloader, 5000);
+    }
 
     // Löschen Funktion
     $scope.deleteProduct = function (id) {

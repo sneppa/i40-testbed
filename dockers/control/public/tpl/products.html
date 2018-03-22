@@ -18,16 +18,18 @@
                                     <th>Attribute</th>
                                     <th>Location</th>
                                     <th>Status</th>
+                                    <th>Fortschritt</th>
                                     <th>Aktionen</th>
                                 </tr></thead>
                             <tbody>
                                 <tr ng-repeat="product in products">
                                     <td>{{product._id}}</td>
                                     <td>{{product.name}}</td>
-                                    <td><span class="btn btn-default btn-sm btn-round" ng-repeat="step in product.step">{{step.index+1}}. {{step.name}}</span></td>
+                                    <td><span class="btn btn-default btn-sm btn-round{{step.index == product.currentStep ? ' btn-fill' : ''}}" ng-repeat="step in product.step">{{step.index+1}}. {{step.name}}</span></td>
                                     <td><span class="btn btn-default btn-sm btn-round" ng-repeat="var in product.var">{{var.name}}: ({{var.value}})</span></td>
                                     <td>{{product.location}}</td>
                                     <td>{{product.status}}</td>
+                                    <td>{{100/product.step.length*product.currentStep+(product.status=='PRODUCE'?100/product.step.length/2:0)+(product.status=='FINISHED'?100/product.step.length:0)}}%</td>
                                     <td>
                                         <span ng-if="product.status == 0">
                                             <span class="btn btn-success btn-sm btn-round" title="löschen" ng-click="startProduct(product._id)"><i class="pe-7s-play"></i></span>
