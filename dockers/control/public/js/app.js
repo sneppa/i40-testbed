@@ -91,15 +91,11 @@ app.controller('ProductOverview', function ($scope, $http, $timeout, $route) {
 
     $scope.products = [];
 
-
-    // Gespeicherten Typen aus DB holen
-    loadRepoUrl($http, $scope, function ($http, $scope) {
-        showInfo("Lade Produkte von " + repositoryUrl + '/product');
-        reloader();
-    });
-    
+    var timer = null;
     var reloader = function () {
-        // 0 ms delay to reload the page.
+        
+        if (timer !== null)
+        $timeout.cancel(timer);
 //        $route.reload();
         $http.get(repositoryUrl + '/product').then(
                 function (res) {
@@ -110,8 +106,20 @@ app.controller('ProductOverview', function ($scope, $http, $timeout, $route) {
                     console.log(err);
                 });
                 
-        $timeout(reloader, 5000);
+        timer = $timeout(reloader, 5000);
     }
+    
+    $scope.$on("$destroy", function() {
+        if (timer) {
+            $timeout.cancel(timer);
+        }
+    });
+
+    // Gespeicherten Typen aus DB holen
+    loadRepoUrl($http, $scope, function ($http, $scope) {
+//        showInfo("Lade Produkte von " + repositoryUrl + '/product');
+        reloader();
+    });
 
     // Löschen Funktion
     $scope.deleteProduct = function (id) {
