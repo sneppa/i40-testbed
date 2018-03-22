@@ -27,11 +27,22 @@ async.series([
             callback(err);
         });
     },
+    // GetVarNode by Path
+    function (callback) {
+        var path = "/Objects/Product/Teile";
+        var browsePath = makeBrowsePath("RootFolder", path);
+        console.log(path.red);
+
+        session.translateBrowsePath(browsePath, function (err, results) {
+            nodeId = results.targets[0].targetId;
+            callback(err);
+        });
+    },
     // Get Value
     function (callback) {
-        var id = "ns=1;s=Teile"; // String ID
-        // id = ns=1;i=1001; // Integer ID
-        session.read({nodeId: id, attributeId: opcua.AttributeIds.Value}, 0, function (err, dataValue) {
+        console.log("Hole Value von: " + nodeId.toString());
+
+        session.read({nodeId: nodeId.toString(), attributeId: opcua.AttributeIds.Value}, 0, function (err, dataValue) {
             if (!err) {
                 console.log("Wert: " + dataValue.value.value);
 //                console.log(" Value = ", dataValue);
