@@ -5,3 +5,7 @@ Hier finden sich Beispiele und Codeschnipsel, die bei der Entwicklung entstanden
 ## client_findServer.js
 
 Aufruf eines Discovery Servers ohne Filter
+
+## client_readVariable.js
+
+Abrufen einer Variable mittels des BrowsePath
