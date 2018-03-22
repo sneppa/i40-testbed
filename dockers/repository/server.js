@@ -141,6 +141,7 @@ function addOpcUaProductServer(product)
 
     server.serverInfo.applicationUri = "urn:PRODUCT_" + product._id;
     server.serverInfo.productUri = "PRODUCT_" + product._id;
+    server.serverInfo.applicationName = {text: product.name, locale: "de"};
 
     logger("Add Product Server: " + product.name + ":" + portcounter);
 
@@ -189,7 +190,8 @@ function initializeAddressspace(product, server)
     console.log(product._id);
 
     // Hinterlegen der standardisierten Werte:
-    addVarToAdressspace(addressSpace, folder, {name: "status", type: "Int16", value: product.status}, product);
+    addVarToAdressspace(addressSpace, folder, {name: "currentStep", type: "Int16", value: product.currentStep}, product);
+    addVarToAdressspace(addressSpace, folder, {name: "status", type: "String", value: product.status}, product);
     addVarToAdressspace(addressSpace, folder, {name: "location", type: "String", value: product.location}, product);
     addVarToAdressspace(addressSpace, folder, {name: "idproduct", type: "String", value: "ID: " + product._id}, product);
 

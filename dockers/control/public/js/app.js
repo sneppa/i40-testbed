@@ -131,7 +131,7 @@ app.controller('ProductOverview', function ($scope, $http) {
 // Produkt produzieren lassen
 app.controller('ProductProduce', function ($scope, $http) {
 
-    var product = {"name": "", "type": "", "type_id": "", "var": [], "step": [], "log": [], "status": 0, "location": null};
+    var product = {"name": "", "type": "", "type_id": "", "var": [], "step": [], "currentStep": [], "log": [], "status": "WAIT", "location": null};
 
     $scope.product = product;
     $scope.types = [];

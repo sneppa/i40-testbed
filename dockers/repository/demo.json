@@ -33,8 +33,9 @@
                             "name": "Verpacken"
                         }],
                     "log": [],
-                    "status": 0,
-                    "location": "non - existent",
+                    "currentStep": 0,
+                    "status": "WAIT",
+                    "location": "",
                     "buildDate": "2012-04-23T18:25:43.511Z"
                 }
             ]
