@@ -49,3 +49,6 @@ not implemented
 
 not implemented
 
+## Beispiele
+
+Unter [examples](https://github.com/sneppa/i40-testbed/tree/master/examples) sind diverse Beispiel für OPC UA zu finden. 
