@@ -2,6 +2,10 @@
 
 Hier finden sich Beispiele und Codeschnipsel, die bei der Entwicklung entstanden sind und für andere Entwickler hilfreich sein könnten.
 
+## client_callMethod.js
+
+Aufruf einer Methode im Adressraum
+
 ## client_findServer.js
 
 Aufruf eines Discovery Servers ohne Filter
