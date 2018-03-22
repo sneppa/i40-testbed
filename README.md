@@ -29,21 +29,17 @@ The testbed can be used only with nodejs, with docker and with kubernetes
 
 2. Start Discovery
 
-``$ cd ./dockers/discovery``
-``$ node server.js``
+``$ cd ./dockers/discovery && node server.js``
 
 3. Start Servers
 
-``$ cd ./dockers/repository``
-``$ node server.js``
+``$ cd ./dockers/repository && node server.js``
 
-``$ cd ./dockers/control``
-``$ node server.js``
+``$ cd ./dockers/control && node server.js``
 
 4. Start OPC UA Active Servers (for each server)
 
-``$ cd ./dockers/server``
-``$ node server.js``
+``$ cd ./dockers/server && node server.js``
 
 ### Docker
 
