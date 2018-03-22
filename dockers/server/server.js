@@ -1,4 +1,5 @@
 var config = require('./config');
+var client = require('./functions/client');
 var opcua = require("node-opcua");
 
 var server = new opcua.OPCUAServer({
@@ -38,19 +39,23 @@ function post_initialize() {
             outputArguments: outputArguments
         }).bindMethod(function (inputArguments, context, callback) {
 
-            var output = method.method(inputArguments);
+            method.method(inputArguments, function (err, dataType, output) {
             
-            console.log(context + " generated: " + output);
-
-            var callMethodResult = {
-                statusCode: opcua.StatusCodes.Good,
-                outputArguments: [{
-                        dataType: opcua.DataType.String,
-                        arrayType: opcua.VariantArrayType.Array,
-                        value: [output]
-                    }]
-            };
-            sleep(method.duration).then(() => {callback(null, callMethodResult);});
+                console.log("Output generated: " + output);
+//
+                var callMethodResult = {
+                    statusCode: opcua.StatusCodes.Good,
+                    outputArguments: [{
+                            dataType: toEnum(dataType),
+                            arrayType: opcua.VariantArrayType.Array,
+                            value: [output]
+                        }]
+                };
+                
+                console.log(callMethodResult);
+                
+                callback(null, callMethodResult);
+            });
         });
     });
 }
@@ -102,6 +107,9 @@ function toEnum(text)
             break;
         case "INT32":
             return opcua.DataType.Int32;
+            break;
+        case "BOOLEAN":
+            return opcua.DataType.Boolean;
             break;
     }
 }
