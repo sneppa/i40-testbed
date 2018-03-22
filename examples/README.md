@@ -8,4 +8,8 @@ Aufruf eines Discovery Servers ohne Filter
 
 ## client_readVariable.js
 
+Abrufen einer Variable mit der NodeId
+
+## client_readVariable_browsePath.js
+
 Abrufen einer Variable mittels des BrowsePath
