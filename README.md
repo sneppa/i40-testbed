@@ -39,7 +39,7 @@ The testbed can be used only with nodejs, with docker and with kubernetes
 
 4. Start OPC UA Active Servers
 
-[How to start Server](https://github.com/sneppa/i40-testbed/tree/master/dockers/server)
+[How to start server](https://github.com/sneppa/i40-testbed/tree/master/dockers/server)
 
 ### Docker
 
