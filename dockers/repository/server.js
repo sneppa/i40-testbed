@@ -59,7 +59,7 @@ mUtil.connectToServer( function( err ) {
                 res.status(500);
                 res.send("");
             }
-            logger("Queried Products");
+//            logger("Queried Products");
         });
     });
 
@@ -185,7 +185,7 @@ function initializeAddressspace(product, server)
         addVarToAdressspace(addressSpace, folder, variable, product);
     });
 
-    console.log(product._id);
+//    console.log(product._id);
 
     // Hinterlegen der standardisierten Werte:
     addVarToAdressspace(addressSpace, folder, {name: "currentStep", type: "Int16", value: product.currentStep}, product);
