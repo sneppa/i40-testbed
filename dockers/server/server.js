@@ -1,6 +1,11 @@
 var config = require('./config');
 var client = require('./functions/client');
+var args = require('./functions/command_args');
 var opcua = require("node-opcua");
+
+// Parameter aus Commando Zeile abfragen
+args.init(process.argv);
+config = args.setConfigs(config);
 
 var server = new opcua.OPCUAServer({
     port: config.port, // the port of the listening socket of the server
