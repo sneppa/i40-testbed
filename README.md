@@ -27,19 +27,19 @@ The testbed can be used only with nodejs, with docker and with kubernetes
 
 ``$ mongod``
 
-2. Start Discovery
+2. Start Discovery Server
 
 ``$ cd ./dockers/discovery && node server.js``
 
-3. Start Servers
+3. Start Repository & Controlpanel
 
 ``$ cd ./dockers/repository && node server.js``
 
 ``$ cd ./dockers/control && node server.js``
 
-4. Start OPC UA Active Servers (for each server)
+4. Start OPC UA Active Servers
 
-``$ cd ./dockers/server && node server.js``
+[How to start Server](https://github.com/sneppa/i40-testbed/tree/master/dockers/server)
 
 ### Docker
 
