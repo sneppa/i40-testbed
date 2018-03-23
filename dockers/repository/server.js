@@ -160,7 +160,7 @@ function addOpcUaProductServer(product)
         // we can now start the server
         server.start(function () {
             var endpointUrl = server.endpoints[0].endpointDescriptions()[0].endpointUrl;
-            logger(("Product Server is now listening (" + server.buildInfo.productName + ": " + endpointUrl + " - ID: " + server.buildInfo.productUri + ")").green);
+            logger(("Product Server is now listening (" + server.buildInfo.productName + ": " + endpointUrl + " - ID: " + server.serverInfo.productUri + ")").green);
 //            server.endpoints[0].endpointDescriptions().forEach(function (endpoint) {
 //                console.log(endpoint.endpointUrl, endpoint.securityMode.toString(), endpoint.securityPolicyUri.toString());
 //            });
