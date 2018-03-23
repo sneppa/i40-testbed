@@ -11,7 +11,7 @@ app.config(function ($routeProvider) {
         templateUrl: 'tpl/server.html',
         controller: 'server',
     }).when('/products', {
-        templateUrl: 'tpl/products.html',
+        templateUrl: 'tpl/products/overview.html',
         controller: 'products',
     }).when('/products/produce', {
         templateUrl: 'tpl/products/produce.html',
