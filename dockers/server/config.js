@@ -20,6 +20,11 @@ config.methods[0] = {
             'name': 'producturi',
             'description': 'Komplette Adresse zu Produkt',
             'dataType': 'String'
+        },
+        {
+            'name': 'forward',
+            'description': 'An nächste Produktionsstufe weitergeben?',
+            'dataType': 'Boolean'
         }
     ],
     'outputArguments': [
@@ -30,6 +35,7 @@ config.methods[0] = {
         }
     ],
     'method': function (args, callback) {
+        var forward = args[1].value;
         client.setUrl(args[0].value);
         client.setStep(config.methods[0].name);
         client.createSession(function (err) {
@@ -40,12 +46,20 @@ config.methods[0] = {
                     result = false;
                 else
                 {
-//                    setTimeout(function () {
-//                        console.log("timed out");
-//                        client.finished(function () {
-//                            console.log("aaaand finished");
-//                        });
-//                    }, 1000);
+                    // After n seconds set product as finished
+                    setTimeout(function () {
+                        client.createSession(function (err) {
+                            client.finished(function () {
+                                console.log("aaaand finished");
+                                client.stopSession();
+                                
+                                if (forward)
+                                {
+                                    console.log("to the next station");
+                                }
+                            });
+                        });
+                    }, 10000);
                 }
                 callback(err, "Boolean", result);
             });
