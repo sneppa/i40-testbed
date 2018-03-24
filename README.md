@@ -19,7 +19,7 @@ Concept and prototype described in https://github.com/sneppa/thesis-template
 
 ## How to use
 
-The testbed can be used only with nodejs, with docker and with kubernetes
+The testbed can be used with nodejs, docker or kubernetes
 
 ### NodeJS
 
