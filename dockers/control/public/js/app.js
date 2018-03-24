@@ -99,7 +99,7 @@ app.controller('serverAdd', function ($scope, $http, $location) {
         $http.post('/api/server', $scope.server).then(
                 function () {
                     showSuccess("Server \"" + $scope.server.name + "\" gespeichert!");
-                    $location.path( "/server" );
+                    $location.path( "/login" );
                 },
                 function () {
                     showStandardError();
@@ -111,8 +111,46 @@ app.controller('products', function ($scope, $http) {
 //    $scope.nav.title = "Produkte"; 
 });
 
-app.controller('network', function ($scope, $http) {
-//    $scope.nav.title = "Produkte"; 
+app.controller('network', function ($scope, $http, $timeout, $location) {
+    $scope.servers = {servers: [], products: []};
+    
+    loadRepoUrl($http, $scope, function ($http, $scope) {
+        $scope.repository = repositoryUrl;
+    });
+    
+    $scope.control = 'http://'+$location.host()+":"+$location.port();
+
+    var timer = null;
+    var reloader = function () {
+        
+        if (timer !== null)
+        $timeout.cancel(timer);
+    
+        $http.get('/api/network/server').then(
+                function (res) {
+                    console.log(res);
+                    res.data.forEach(function (item) {
+                        if (item.productUri.substr(0,8) == "PRODUCT_")
+                            $scope.servers.products.push(item);
+                        else
+                            $scope.servers.servers.push(item);
+                    })
+                },
+                function (err) {
+                    showError("Konnte Server nicht lesen!");
+                    console.log(err);
+                });
+                
+//        timer = $timeout(reloader, 5000);
+    }
+    
+    reloader();
+    
+    $scope.$on("$destroy", function() {
+        if (timer) {
+            $timeout.cancel(timer);
+        }
+    });
 });
 
 app.controller('networkdiagram', function ($scope) {

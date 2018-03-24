@@ -1,47 +1,26 @@
 var opcua = require("node-opcua");
+var config = require("../config");
 var opcClient = new opcua.OPCUAClient();
 
 var endpointUrl;
-var step;
-var status;
 var session;
 
 var client = {
-    setUrl: function (urlToProduct) {
-        endpointUrl = urlToProduct;
-    },
-    setStep: function (currentStepName) {
-        step = currentStepName;
-    },
-//    setStatus: function (currentStatus) {
-//        status = currentStatus;
-//    },
-    /**
-     * Produkt muss warten
-     */
-    wait: function (callback) {
-        callStatusMethod(step, "WAIT", callback);
-    },
-    /**
-     * Produkt wird verarbeitet
-     */
-    produce: function (callback) {
-        callStatusMethod(step, "PRODUCE", callback);
-    },
-    /**
-     * Produkt wurde fertig verarbeitet
-     */
-    finished: function (callback) {
-        callStatusMethod(step, "FINISHED", callback);
-    },
-    /**
-     * Zum nächsten Produktionsschritt senden
-     */
-    next: function () {
-//        callStatusMethod(step, "FINISHED", callback);
+    findServers: function (callback) {
+        ConnectToServer(config.discovery.url, function (err) {
+            if (err) {
+                console.log('err: ' + err);
+            } else {
+                opcClient.findServers(function (err, servers) {
+//                    console.log(servers);
+                    callback(err, servers);
+                    opcClient.disconnect(function (err) {});
+                });
+            }
+        });
     },
     createSession: function (callback) {
-        ConnectToServer(function (err) {
+        ConnectToServer(endpointUrl, function (err) {
             if (err) {
                 console.log('err: ' + err);
             } else {
@@ -63,12 +42,12 @@ var client = {
 };
 
 
-function ConnectToServer(callback) {
+function ConnectToServer(endpointUrl, callback) {
     opcClient.connect(endpointUrl, function (err) {
         if (err) {
             console.log(" cannot connect to endpoint :", endpointUrl);
         } else {
-            console.log("Client connected to "+endpointUrl);
+            console.log("Client connected to " + endpointUrl);
         }
         callback(err);
     });

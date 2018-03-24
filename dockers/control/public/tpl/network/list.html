@@ -13,10 +13,17 @@
                         <table class="table table-hover table-striped">
                             <thead>
                                 <tr><th>Server</th>
-                                    <th>Ports</th>
-                                    <th>Beschreibung</th>
+                                    <th>Name</th>
                                 </tr></thead>
                             <tbody>
+                                <tr>
+                                    <td>{{control}}</td>
+                                    <td>Controlpanel</td>
+                                </tr>
+                                <tr>
+                                    <td>{{repository}}</td>
+                                    <td>Repository</td>
+                                </tr>
                             </tbody>
                         </table>
 
@@ -30,11 +37,16 @@
                     <div class="content table-responsive table-full-width">
                         <table class="table table-hover table-striped">
                             <thead>
-                                <tr><th>Server</th>
-                                    <th>Ports</th>
-                                    <th>Beschreibung</th>
+                                <tr><th>URI</th>
+                                    <th>Server</th>
+                                    <th>Name</th>
                                 </tr></thead>
                             <tbody>
+                                <tr ng-repeat="server in servers.servers">
+                                    <td>{{server.productUri}}</td>
+                                    <td>{{server.discoveryUrls[0][0]}}</td>
+                                    <td>{{server.applicationName.text}}</td>
+                                </tr>
                             </tbody>
                         </table>
 
@@ -46,17 +58,17 @@
                         <p class="category">Produkte die im Repository liegen</p>
                     </div>
                     <div class="content table-responsive table-full-width">
-                        <table class="table table-hover table-striped" ng-controller="ProductOverview">
+                        <table class="table table-hover table-striped">
                             <thead>
-                                <tr><th>Server</th>
-                                    <th>Ports</th>
-                                    <th>Beschreibung</th>
+                                <tr><th>URI</th>
+                                    <th>Server</th>
+                                    <th>Name</th>
                                 </tr></thead>
                             <tbody>
-                                <tr ng-repeat="product in products">
-                                    <td>Repo</td>
-                                    <td>3000</td>
-                                    <td>{{product._id}}: {{product.name}}</td>
+                                <tr ng-repeat="product in servers.products">
+                                    <td>{{product.productUri}}</td>
+                                    <td>{{product.discoveryUrls[0][0]}}</td>
+                                    <td>{{product.applicationName.text}}</td>
                                 </tr>
                             </tbody>
                         </table>

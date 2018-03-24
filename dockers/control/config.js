@@ -15,7 +15,6 @@ config.repository = 'http://localhost:8090/api'; // Started with: node
 
 config.discovery = {};
 config.discovery.url = 'opc.tcp://localhost:4840'; // URL zum Discovery Server
-config.discovery.enabled = true; // Discovery Server an/aus schalten
 
 config.demo = false; // Datenbank wird automatisch gefüllt.
 

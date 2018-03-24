@@ -1,6 +1,7 @@
 'use strict';
 
 var config = require('./config');
+var opcClient = require('./functions/client');
 var express = require("express");
 var bodyParser = require("body-parser");
 var mongodb = require('mongodb');
@@ -41,6 +42,20 @@ MongoClient.connect(url, function (err, client) {
     var producttypes = db.collection('producttypes');
     var products = db.collection('products');
     var servers = db.collection('servers');
+
+    // Server des Netzwerks abfragen
+    app.get('/api/network/server', function (req, res) {
+        opcClient.findServers(function (err, servers) {
+            if (err == null)
+            {
+                res.status(200);
+            }
+            else
+                res.status(500);
+            res.send(servers);
+        });
+//        logger(req.body);
+    });
 
     // Neuer Server erstellen
     app.post('/api/server', function (req, res) {
