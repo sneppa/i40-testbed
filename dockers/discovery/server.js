@@ -6,7 +6,12 @@ var OPCUAClient = opcua.OPCUAClient;
 
 var discovery_server, discovery_server_endpointUrl;
 
-discovery_server = new OPCUADiscoveryServer({port: 4840});
+discovery_server = new OPCUADiscoveryServer({port: 4840, buildInfo: { productName: 'DiscoveryServer' }});
+
+discovery_server.serverInfo.applicationName = {text: "DiscoveryServer", locale: null};
+discovery_server.serverInfo.applicationUri = 'urn:DiscoveryServer';
+discovery_server.serverInfo.productUri = 'DiscoveryServer'; 
+
 discovery_server_endpointUrl = discovery_server._get_endpoints()[0].endpointUrl;
 discovery_server.start(function () {
     console.log("Discovery Server is now listening ... ( press CTRL+C to stop)");
