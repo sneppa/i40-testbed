@@ -155,6 +155,10 @@ app.controller('ProductOverview', function ($scope, $http, $timeout, $route) {
 
             if (product !== null)
             {
+                product.status = "WAIT";
+                product.location = "Lager";
+                product.currentStep = 0;
+                
                 $http.post(repositoryUrl + '/product/' + id, product).then(
                 function (res) {
                     showWarning("Produkt zurückgesetzt!");

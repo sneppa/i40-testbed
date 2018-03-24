@@ -94,8 +94,14 @@ mUtil.connectToServer( function( err ) {
 
     // Produkt aktualisieren
     app.post('/api/product/:productid', function (req, res) {
-        logger("update: " + req.params.productid);
-        mUtil.updateProduct(req.body);
+        logger("Updated: " + req.body.name);
+        mUtil.updateProduct(req.body, function (err, result) {
+            if (err)
+                res.status(500);
+            else
+                res.status(200);
+            res.send("");
+        });
     });
 });
 

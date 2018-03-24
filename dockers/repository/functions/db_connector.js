@@ -23,10 +23,15 @@ module.exports = {
 
         return await products.findOne({"_id": new mongodb.ObjectID(idproduct)});
     },
-    updateProduct: async function (product) {
+    updateProduct: function (product, callback) {
         var products = _db.collection('products');
-        console.log("Update: "+product.name);
-        return await products.updateOne({"_id": new mongodb.ObjectID(product._id)}, {$set: product});
+//        console.log("Update: "+product.name);
+//        console.log(product);
+        var updateId = product._id;
+        delete product._id;
+        products.updateOne({"_id": new mongodb.ObjectID(updateId)}, {$set: product}, function (err, result) {
+            callback(err, result);
+        });
     },
     deleteProduct: function (idproduct, callback) {
         var products = _db.collection('products');
