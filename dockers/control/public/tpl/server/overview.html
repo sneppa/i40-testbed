@@ -1,0 +1,48 @@
+<ng-include src="'tpl/server/nav.html'"></ng-include>
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="header">
+                        <h4 class="title">Server</h4>
+                        <p class="category">Alle Server gestoppt/gestartet</p>
+                    </div>
+                    <div class="content table-responsive table-full-width">
+                        <table class="table table-hover table-striped">
+                            <thead>
+                                <tr><th>URI</th>
+                                    <th>Port</th>
+                                    <th>Name</th>
+                                    <th>Methode</th>
+                                    <th>Duration</th>
+                                    <th>Aktionen</th>
+                                </tr></thead>
+                            <tbody>
+                                <tr ng-repeat="server in servers">
+                                    <td>SERVER_{{server._id}}</td>
+                                    <td>{{server.port}}</td>
+                                    <td>{{server.name}}</td>
+                                    <td>{{server.method}}</td>
+                                    <td>{{server.duration}}</td>
+                                    <td>
+                                        <span ng-if="server.paused">
+                                            <span class="btn btn-primary btn-sm btn-round" title="Starten" ng-click="startServer(server._id)"><i class="pe-7s-play"></i></span>
+                                        </span>
+                                        <span ng-if="!server.paused">
+                                            <span class="btn btn-primary btn-sm btn-round" title="Stoppen" ng-click="pauseServer(server._id)"><i class="pe-7s-pause"></i></span>
+                                        </span>
+                                        
+                                        <span class="btn btn-danger btn-sm btn-round" title="löschen" ng-click="deleteServer(server._id)" tite="Produkt löschen"><i class="pe-7s-trash"></i></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

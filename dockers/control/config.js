@@ -13,6 +13,10 @@ config.repository = 'http://localhost:8090/api'; // Started with: node
 //config.repository = 'http://localhost:8090/api'; // Started with: docker
 //config.repository = 'http://localhost:8090/api'; // Started with: kubernetes
 
-config.demo = true; // @TODO Datenbank wird automatisch gefüllt.
+config.discovery = {};
+config.discovery.url = 'opc.tcp://localhost:4840'; // URL zum Discovery Server
+config.discovery.enabled = true; // Discovery Server an/aus schalten
+
+config.demo = false; // Datenbank wird automatisch gefüllt.
 
 module.exports = config;

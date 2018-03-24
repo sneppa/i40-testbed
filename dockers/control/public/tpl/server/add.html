@@ -1,0 +1,62 @@
+<ng-include src="'tpl/server/nav.html'"></ng-include>
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="header">
+                        <h4 class="title">Server hinzufügen</h4>
+                    </div>
+                    <div class="content">
+                        <form ng-submit="saveForm()">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Name</label>
+                                        <input required="" class="form-control" ng-model="server.name" name="name" placeholder="Zerschneider 3000" value="" type="text">
+                                    </div>
+                                </div>
+                            </div>
+<!--                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>URI</label>
+                                        <input required="" class="form-control" ng-model="server.uri" name="uri" placeholder="SERVER_ZERSCHNEIDER-324768231" value="" type="text">
+                                    </div>
+                                </div>
+                            </div>-->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Methodenname</label>
+                                        <input required="" class="form-control" ng-model="server.method" name="method" placeholder="Zuschneiden" value="" type="text">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Dauer (in ms)</label>
+                                        <input required="" class="form-control" ng-model="server.duration" name="duration" placeholder="1000" value="" type="number">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Port</label>
+                                        <input required="" class="form-control" ng-model="server.port" name="duration" placeholder="4001" value="" type="number">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-info btn-fill pull-right">Server erstellen</button>
+                            <div class="clearfix"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

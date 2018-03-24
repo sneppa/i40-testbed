@@ -8,8 +8,11 @@ app.config(function ($routeProvider) {
         templateUrl: 'tpl/dashboard.html',
         controller: 'dashboard',
     }).when('/server', {
-        templateUrl: 'tpl/server.html',
+        templateUrl: 'tpl/server/overview.html',
         controller: 'server',
+    }).when('/server/add', {
+        templateUrl: 'tpl/server/add.html',
+        controller: 'serverAdd',
     }).when('/products', {
         templateUrl: 'tpl/products/overview.html',
         controller: 'products',
@@ -42,9 +45,66 @@ app.controller('dashboard', function ($scope) {
 //    $scope.nav.title = "Dashboard";
 });
 
-app.controller('server', function ($scope) {
-//    $scope.nav.title = "Server";
+app.controller('server', function ($scope, $http, $timeout) {
+    $scope.servers = [];
 
+    var timer = null;
+    var reloader = function () {
+        
+        if (timer !== null)
+        $timeout.cancel(timer);
+//        $route.reload();
+        $http.get('api/server').then(
+                function (res) {
+                    $scope.servers = res.data;
+                },
+                function (err) {
+                    showError("Konnte Server nicht lesen!");
+                    console.log(err);
+                });
+                
+        timer = $timeout(reloader, 5000);
+    }
+    
+    reloader();
+    
+    $scope.$on("$destroy", function() {
+        if (timer) {
+            $timeout.cancel(timer);
+        }
+    });
+    
+    $scope.deleteServer = function (idserver) {
+        $http.delete('/api/server/' + idserver).then(
+                function (res) {
+                    $scope.servers.forEach(function (item, index, object) {
+                        if (item._id == idserver)
+                            object.splice(index, 1);
+                    })
+                    showSuccess("Server gelöscht!");
+                },
+                function () {
+                    showStandardError();
+                });
+    };
+});
+
+app.controller('serverAdd', function ($scope, $http, $location) {
+//    $scope.nav.title = "Server";
+    $scope.server = {paused: true};
+
+    $scope.saveForm = function () {
+        console.log($scope.server);
+
+        $http.post('/api/server', $scope.server).then(
+                function () {
+                    showSuccess("Server \"" + $scope.server.name + "\" gespeichert!");
+                    $location.path( "/server" );
+                },
+                function () {
+                    showStandardError();
+                });
+    }
 });
 
 app.controller('products', function ($scope, $http) {

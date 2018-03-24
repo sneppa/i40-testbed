@@ -29,7 +29,7 @@ app.use(function (req, res, next) {
 
 // App bereitstellen
 app.listen(8080, function () {
-    logger('Example app listening on port 8080!');
+    logger('Controlpanel listening on port 8080!');
 });
 
 
@@ -40,22 +40,23 @@ MongoClient.connect(url, function (err, client) {
     var db = client.db(dbName);
     var producttypes = db.collection('producttypes');
     var products = db.collection('products');
+    var servers = db.collection('servers');
 
-    // Neues Produkt erstellen
-    app.post('/api/product', function (req, res) {
-        products.insert(req.body, function (err, records) {
+    // Neuer Server erstellen
+    app.post('/api/server', function (req, res) {
+        servers.insert(req.body, function (err, records) {
             if (err == null)
                 res.status(200);
             else
                 res.status(500);
             res.send("");
         });
-        logger(req.body);
+//        logger(req.body);
     });
 
-    // Produkte abfragen
-    app.get('/api/product', function (req, res) {
-        products.find({}).toArray(function (err, result) {
+//     Server abfragen
+    app.get('/api/server', function (req, res) {
+        servers.find({}).toArray(function (err, result) {
             if (err == null)
             {
                 res.status(200);
@@ -65,15 +66,56 @@ MongoClient.connect(url, function (err, client) {
                 res.status(500);
                 res.send("");
             }
-            logger("Queried Product");
-            logger(result);
+            logger("Queried Servers");
+//            logger(result);
         });
     });
+
+    // Löschen eines Servers
+    app.delete('/api/server/:typeid', function (req, res) {
+        logger("Delete server: " + req.params.typeid);
+        servers.remove({"_id": new mongodb.ObjectID(req.params.typeid)}, function (err, result) {
+            if (err == null)
+                res.status(200);
+            else
+                res.status(500);
+
+            res.send("");
+        });
+    })
+
+    // Neues Produkt erstellen -> Ausgelagert auf Repo
+//    app.post('/api/product', function (req, res) {
+//        products.insert(req.body, function (err, records) {
+//            if (err == null)
+//                res.status(200);
+//            else
+//                res.status(500);
+//            res.send("");
+//        });
+//        logger(req.body);
+//    });
+
+    // Produkte abfragen -> Ausgelagert auf Repo
+//    app.get('/api/product', function (req, res) {
+//        products.find({}).toArray(function (err, result) {
+//            if (err == null)
+//            {
+//                res.status(200);
+//                res.send(result);
+//            } else
+//            {
+//                res.status(500);
+//                res.send("");
+//            }
+//            logger("Queried Product");
+//            logger(result);
+//        });
+//    });
 
     // Neuer Produkttyp erstellen
     app.post('/api/producttype', function (req, res) {
         producttypes.insert(req.body, function (err, records) {
-
             if (err == null)
                 res.status(200);
             else
