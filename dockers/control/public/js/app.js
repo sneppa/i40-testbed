@@ -128,13 +128,95 @@ app.controller('network', function ($scope, $http, $timeout, $location) {
     
         $http.get('/api/network/server').then(
                 function (res) {
-                    console.log(res);
+//                    console.log(res);
+                    $scope.servers = {servers: [], products: []};
+                    
                     res.data.forEach(function (item) {
                         if (item.productUri.substr(0,8) == "PRODUCT_")
                             $scope.servers.products.push(item);
                         else
                             $scope.servers.servers.push(item);
                     })
+                },
+                function (err) {
+                    showError("Konnte Server nicht lesen!");
+                    console.log(err);
+                });
+                
+        timer = $timeout(reloader, 5000);
+    }
+    
+    reloader();
+    
+    $scope.$on("$destroy", function() {
+        if (timer) {
+            $timeout.cancel(timer);
+        }
+    });
+});
+
+app.controller('networkdiagram', function ($scope, $http, $timeout, $location) {
+    
+    var timer = null;
+    var reloader = function () {
+        
+        if (timer !== null)
+        $timeout.cancel(timer);
+    
+        $http.get('/api/network/server').then(
+                function (res) {
+//                    console.log(res);
+                    $scope.servers = {servers: [], products: []};
+                    
+                    var rawNodes = [{id: 'repo', label: 'Repository', group: 0, font: {face: 'Roboto'}}, 
+                                    {id: 'control', label: 'Control'+":"+$location.port(), group: 2, font: {face: 'Roboto'}}];
+                    var rawEdges = [{from: 'repo', to: 'DiscoveryServer'}, {from: 'repo', to: 'control'}];
+                    
+                    res.data.forEach(function (item) {
+                        var port = getPortFromURL(item.discoveryUrls[0][0]);
+                        var node = {id: item.productUri, label: item.applicationName.text+':'+port, shape: 'box', font: {face: 'Roboto'}};
+                        
+                        
+                        if (item.productUri.substr(0,8) == "PRODUCT_")
+                        {
+                            rawEdges.push({from: item.productUri, to: 'repo'});
+                            node.group = 0;
+                        }
+                        else if (item.productUri != 'DiscoveryServer')
+                        {
+                            rawEdges.push({from: item.productUri, to: 'DiscoveryServer', length: 200});
+                            node.group = 1;
+                        }
+                        else if (item.productUri == 'DiscoveryServer')
+                        {
+                            node.group = 3;
+//                            node.color = '#FFFFFF';
+//                            node.shape = 'icon';
+//                            node.icon = {
+//                              face: 'Pe-icon-7-stroke',
+//                              code: "\e617",
+//                              size: 50,
+//                              color: '#f0a30a',
+//                              style: 'normal',
+//                              weight: 'normal',
+//                              variant: 'normal'
+//                            };
+                        }
+                        
+                        rawNodes.push(node);
+                    })
+
+                    // create a network
+                    var container = document.getElementById('mynetwork');
+                    var data = {
+                        nodes: new vis.DataSet(rawNodes),
+                        edges: new vis.DataSet(rawEdges)
+                    };
+                    var rand = 0.6120323969355027; //Math.random();
+//                    console.log(rand);
+                    
+                    var options = {layout:{randomSeed:rand}};
+                    var network = new vis.Network(container, data, options);
                 },
                 function (err) {
                     showError("Konnte Server nicht lesen!");
@@ -151,35 +233,6 @@ app.controller('network', function ($scope, $http, $timeout, $location) {
             $timeout.cancel(timer);
         }
     });
-});
-
-app.controller('networkdiagram', function ($scope) {
-    // create an array with nodes
-    var nodes = new vis.DataSet([
-        {id: 1, label: 'Node 1'},
-        {id: 2, label: 'Node 2'},
-        {id: 3, label: 'Node 3'},
-        {id: 4, label: 'Node 4'},
-        {id: 5, label: 'Node 5'}
-    ]);
-
-    // create an array with edges
-    var edges = new vis.DataSet([
-        {from: 1, to: 3},
-        {from: 1, to: 2},
-        {from: 2, to: 4},
-        {from: 2, to: 5},
-        {from: 3, to: 3}
-    ]);
-
-    // create a network
-    var container = document.getElementById('mynetwork');
-    var data = {
-        nodes: nodes,
-        edges: edges
-    };
-    var options = {};
-    var network = new vis.Network(container, data, options);
 });
 
 // ------------------------------- Products
@@ -442,4 +495,15 @@ function loadRepoUrl($http, $scope, callback)
         });
     else
         callback($http, $scope);
+}
+
+function getPortFromURL(url) {
+    console.log(url);
+    var regex = /^(http|https|opc.tcp):\/\/[^:\/]+(?::(\d+))?/;
+    var match = url.match(regex);
+    if (match === null) {
+        return null;
+    } else {
+        return match[2] ? match[2] : {http: "80", https: "443"}[match[1]];
+    }
 }
