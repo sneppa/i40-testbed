@@ -33,6 +33,9 @@ app.config(function ($routeProvider) {
         controller: 'networkdiagram',
     }).when('/help', {
         templateUrl: 'tpl/help.html',
+    }).when('/log', {
+        templateUrl: 'tpl/log.html',
+        controller: 'log',
     });
     $routeProvider.otherwise({redirectTo: '/dashboard'});
 });
@@ -440,6 +443,35 @@ app.controller('ProductAdd', function ($scope, $http) {
 
 });
 
+app.controller('log', function ($scope, $http, $timeout, $location) {
+    $scope.logs = [];
+    
+    var timer = null;
+    var reloader = function () {
+        
+        if (timer !== null)
+        $timeout.cancel(timer);
+    
+        $http.get('/api/log').then(
+                function (res) {
+                    $scope.logs = res.data;
+                },
+                function (err) {
+                    showError("Konnte Logs nicht laden!");
+                    console.log(err);
+                });
+                
+        timer = $timeout(reloader, 5000);
+    }
+    
+    reloader();
+    
+    $scope.$on("$destroy", function() {
+        if (timer) {
+            $timeout.cancel(timer);
+        }
+    });
+});
 // ------------------------------- Notifications
 
 function showInfo(text)

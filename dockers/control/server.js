@@ -2,6 +2,7 @@
 
 var config = require('./config');
 var opcClient = require('./functions/client');
+var dbLogger = require('./functions/logger');
 var express = require("express");
 var bodyParser = require("body-parser");
 var mongodb = require('mongodb');
@@ -28,15 +29,16 @@ app.use(function (req, res, next) {
     next();
 });
 
-// App bereitstellen
-app.listen(8080, function () {
-    logger('Controlpanel listening on port 8080!');
-});
-
-
 // Datenbankoperationen
 MongoClient.connect(url, function (err, client) {
     assert.equal(null, err);
+    
+    // App bereitstellen
+    app.listen(8080, function () {
+        dbLogger.init("Control", client);
+        dbLogger.log('Controlpanel listening on port 8080!');
+    });
+    
     logger("Connected successfully to mongoDB server");
     var db = client.db(dbName);
     var producttypes = db.collection('producttypes');
@@ -179,6 +181,20 @@ MongoClient.connect(url, function (err, client) {
     // Repository abfragen
     app.get('/api/repository', function (req, res) {
         res.send(config.repository);
+    });
+
+    // Log abfragen
+    app.get('/api/log', function (req, res) {
+        dbLogger.getLogs(50, function (err, logs) {
+            if (err == null)
+            {
+                res.status(200);
+            }
+            else
+                res.status(500);
+            res.send(logs);
+        });
+//        logger(req.body);
     });
 
 });
