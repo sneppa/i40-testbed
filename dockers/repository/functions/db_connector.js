@@ -27,5 +27,12 @@ module.exports = {
         var products = _db.collection('products');
         console.log("Update: "+product.name);
         return await products.updateOne({"_id": new mongodb.ObjectID(product._id)}, {$set: product});
+    },
+    deleteProduct: function (idproduct, callback) {
+        var products = _db.collection('products');
+        console.log("Delete: "+idproduct);
+        products.remove({"_id": new mongodb.ObjectID(idproduct)}, function (err, result) {
+            callback(err, result);
+        });
     }
 };

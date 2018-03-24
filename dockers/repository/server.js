@@ -66,10 +66,10 @@ mUtil.connectToServer( function( err ) {
     // Produkte löschen
     app.delete('/api/product/:productid', function (req, res) {
         logger("remove: " + req.params.productid);
-        products.remove({"_id": new mongodb.ObjectID(req.params.productid)}, function (err, result) {
+        mUtil.deleteProduct(req.params.productid, function (err, result) {
             if (err == null)
             {
-                stopOpcUaProductServer(req.params.productid);
+                stopOpcUaProductServer(req.params.productid, function () {  });
                 res.status(200);
             } else
                 res.status(500);
@@ -90,6 +90,12 @@ mUtil.connectToServer( function( err ) {
                 res.status(500);
             res.send("");
         });
+    });
+
+    // Produkt aktualisieren
+    app.post('/api/product/:productid', function (req, res) {
+        logger("update: " + req.params.productid);
+        mUtil.updateProduct(req.body);
     });
 });
 
@@ -315,16 +321,6 @@ function toEnum(text)
             return opcua.DataType.Int16;
             break;
     }
-}
-
-/**
- * Stopt den angegbenen Server
- * @param {Integer} productid
- * @returns {undefined}
- */
-function stopOpcUaProductServer(productid)
-{
-    stopOpcUaProductServer(productid, function () {});
 }
 
 /**

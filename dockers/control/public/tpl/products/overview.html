@@ -31,14 +31,15 @@
                                     <td>{{product.status}}</td>
                                     <td>{{100/product.step.length*product.currentStep+(product.status=='PRODUCE'?100/product.step.length/2:0)+(product.status=='FINISHED'?100/product.step.length:0)}}%</td>
                                     <td>
-                                        <span ng-if="product.status == 0">
-                                            <span class="btn btn-success btn-sm btn-round" title="löschen" ng-click="startProduct(product._id)"><i class="pe-7s-play"></i></span>
+                                        <span ng-if="product.status == 0 && product.currentStep == 0">
+                                            <span class="btn btn-success btn-sm btn-round" title="Produzieren" ng-click="startProduct(product._id)"><i class="pe-7s-play"></i></span>
                                         </span>
                                         <span ng-if="product.status > 0">
                                             <span class="btn btn-warning btn-sm btn-round" title="löschen" ng-click="stopProduct(product._id)"><i class="pe-7s-power"></i></span>
                                         </span>
                                         
-                                        <span class="btn btn-danger btn-sm btn-round" title="löschen" ng-click="deleteProduct(product._id)"><i class="pe-7s-trash"></i></span>
+                                        <span class="btn btn-warning btn-sm btn-round" title="löschen" ng-click="resetProduct(product._id)" title="Produktionsschritte zurücksetzen"><i class="pe-7s-gleam"></i></span>
+                                        <span class="btn btn-danger btn-sm btn-round" title="löschen" ng-click="deleteProduct(product._id)" tite="Produkt löschen"><i class="pe-7s-trash"></i></span>
                                     </td>
                                 </tr>
                             </tbody>

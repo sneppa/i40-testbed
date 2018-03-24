@@ -141,6 +141,31 @@ app.controller('ProductOverview', function ($scope, $http, $timeout, $route) {
         });
 
     };
+
+    // Reset Funktion
+    $scope.resetProduct = function (id) {
+
+        loadRepoUrl($http, $scope, function ($http, $scope) {
+            
+            var product = null;
+            $scope.products.forEach(function (item, index, object) {
+                if (item._id == id)
+                    product = item;
+            });
+
+            if (product !== null)
+            {
+                $http.post(repositoryUrl + '/product/' + id, product).then(
+                function (res) {
+                    showWarning("Produkt zurückgesetzt!");
+                },
+                function () {
+                    showStandardError();
+                });
+            }
+        });
+
+    };
 });
 
 // Produkt produzieren lassen
@@ -273,6 +298,10 @@ function showSuccess(text)
 function showError(text)
 {
     showNotification("close-circle", "danger", text);
+}
+function showWarning(text)
+{
+    showNotification("attention", "warning", text);
 }
 function showStandardError()
 {
