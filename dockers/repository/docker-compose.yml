@@ -7,7 +7,7 @@ services:
       - /data/db
       - /data/configdb
     ports:
-      - "27017:27017"
+      - "27018:27018"
   repository:
     container_name: repository
 #    restart: always
