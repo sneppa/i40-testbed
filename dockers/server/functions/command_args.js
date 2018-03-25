@@ -4,7 +4,7 @@ function format(param)
 {
 //    param += "=sad";
     console.log("param: >"+param+"<");
-    var tiles = param.match(/\-([a-zA-Z]+)\=([a-zA-Z0-9\ ]+)$/);
+    var tiles = param.match(/\-([a-zA-Z]+)\=([a-zA-Z0-9\ \_]+)$/);
     if (tiles !== null)
     {
         return([tiles[1], tiles[2]]);

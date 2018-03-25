@@ -4,7 +4,7 @@ Mit diesem (späteren) Docker können neue OPC UA Server für das Testbed erstel
 Über die config.js können alle Methoden angepasst werden, die der Server bereitstellt.
 Die erste Methode des Servers ist die Produktionsmethode (kann später erweitert werden).
 
-Starten des Servers:
+## Starten des Servers:
 
 ``$ node server.js -name='' -method='' -duration='' -uri='' [-port='']``
 
@@ -18,5 +18,19 @@ Beispielaufruf:
 
 ``$ node server.js -name='Zuschneider 3000' -method=zuschneiden -duration=1000 -uri=ZUSCHNEIDSERVER``
 
-ToDo:
+## Starten mit Docker:
+
+Vor dem ersten Starten bauen:
+
+`` $ docker build -t i40/server .``
+
+Starten mit:
+
+`` docker run -p 4334:4334 -e name='' -e method='' -e duration='' -e uri='' [-e port='']``
+
+Beispielaufruf:
+
+`` docker run -p 4334:4334 -e name='Zuschneider 3000' -e method=zuschneiden -e duration=1000 -e uri=ZUSCHNEIDSERVER -e port=4334 ``
+
+## ToDo:
 - Automatische Produktionsketter
