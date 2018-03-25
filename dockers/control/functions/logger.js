@@ -36,7 +36,7 @@ function saveToCollection(text, type)
 {
     _db = _client.db(config.db.name);
     var logs = _db.collection('logger');
-    logs.insert({server: _server, msg: text, type: type});
+    logs.insert({server: _server, msg: text, type: type, date: new Date()});
 }
 
 module.exports = logger;

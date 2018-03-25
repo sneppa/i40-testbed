@@ -102,7 +102,7 @@ app.controller('serverAdd', function ($scope, $http, $location) {
         $http.post('/api/server', $scope.server).then(
                 function () {
                     showSuccess("Server \"" + $scope.server.name + "\" gespeichert!");
-                    $location.path( "/login" );
+                    $location.path("/server");
                 },
                 function () {
                     showStandardError();
