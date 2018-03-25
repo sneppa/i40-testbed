@@ -1,7 +1,7 @@
 version: "2"
 services:
-  mongodb:
-    container_name: mongodb
+  repodb:
+    container_name: repodb
     image: mongo
     volumes:
       - /data/db
