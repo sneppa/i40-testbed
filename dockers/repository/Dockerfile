@@ -11,7 +11,7 @@ RUN npm install
 # Copy source code
 COPY . .
 
-EXPOSE 8080
+EXPOSE 8090
 EXPOSE 30000-30100
 
 CMD ["sh", "-c", "node server.js"]
