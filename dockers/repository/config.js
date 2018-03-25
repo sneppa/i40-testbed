@@ -8,7 +8,8 @@ config.discovery.enabled = true; // Discovery Server an/aus schalten
 
 // MongoDB Einstellungen
 config.db = {};
-config.db.url = 'mongodb://localhost:27017';
+config.db.url = 'mongodb://localhost:27017'; // NodeJS
+config.db.url = 'mongodb://mongodb:27017'; // Docker
 config.db.name = 'repository';
 
 config.product = {};
