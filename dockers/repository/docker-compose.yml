@@ -16,6 +16,6 @@ services:
       - "8080:8080"
       - "30000-30100:30000-30100"
     links:
-      - mongodb
+      - repodb
     depends_on:
-      - mongodb
+      - repodb
