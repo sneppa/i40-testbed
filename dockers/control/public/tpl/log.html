@@ -36,12 +36,14 @@
                         <table class="table table-hover table-striped">
                             <thead>
                                 <tr><th>Server</th>
+                                    <th>Datum</th>
                                     <th>Nachricht</th>
                                     <th>Art</th>
                                 </tr></thead>
                             <tbody>
                                 <tr ng-repeat="msg in logs">
                                     <td>{{msg.server}}</td>
+                                    <td>{{msg.date}}</td>
                                     <td>{{msg.msg}}</td>
                                     <td>{{msg.type}}</td>
                                 </tr>
