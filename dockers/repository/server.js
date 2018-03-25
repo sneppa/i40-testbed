@@ -254,17 +254,14 @@ function addVarToAdressspace(addressSpace, folder, variable, product)
         }
 
         // Datenbank aktualisieren
-        mUtil.updateProduct(product);
-//        var newvalues = {$set: product};
-//        console.log(newvalues);
-//        db.collection("products").update({"_id": new mongodb.ObjectID(product._id)}, newvalues, function (err, res) {
-//            if (err == null)
-//            {
-//                logger("Wert gespeichert".green);
-//                logger(res.result);
-//            } else
-//                logger("Fehler bei Wert speichern".red);
-//        });
+        mUtil.updateProduct(product, function (err, res) {
+            if (err == null)
+            {
+                logger("Wert gespeichert".green);
+                logger(res.result);
+            } else
+                logger("Fehler bei Wert speichern".red);
+        });
 
         return opcua.StatusCodes.Good;
     }
