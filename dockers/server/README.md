@@ -30,7 +30,7 @@ Starten mit:
 
 Beispielaufruf:
 
-`` docker run -p 4334:4334 -e name='Zuschneider 3000' -e method=zuschneiden -e duration=1000 -e uri=ZUSCHNEIDSERVER -e port=4334 ``
+`` docker run -p 4334:4334 -e name='Zuschneider 3000' -e method=zuschneiden -e duration=1000 -e uri=ZUSCHNEIDSERVER -e port=4334 i40/server``
 
 ## ToDo:
 - Automatische Produktionsketter

@@ -12,6 +12,8 @@ discovery_server.serverInfo.applicationName = {text: "DiscoveryServer", locale: 
 discovery_server.serverInfo.applicationUri = 'urn:DiscoveryServer';
 discovery_server.serverInfo.productUri = 'DiscoveryServer'; 
 
+//console.log(discovery_server._get_endpoints());
+
 discovery_server_endpointUrl = discovery_server._get_endpoints()[0].endpointUrl;
 discovery_server.start(function () {
     console.log("Discovery Server is now listening ... ( press CTRL+C to stop)");
