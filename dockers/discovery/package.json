@@ -1,6 +1,12 @@
 {
     "name": "discovery",
     "version": "1.0.0",
+    "description": "OPC UA Discovery Server",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/sneppa/i40-testbed.git"
+    },
     "keywords": [
         "util",
         "functional",

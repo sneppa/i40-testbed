@@ -1,6 +1,12 @@
 {
     "name": "repository",
     "version": "1.0.0",
+    "description": "OPC UA Repository simulating all Industry 4.0 products",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/sneppa/i40-testbed.git"
+    },
     "keywords": [
         "util",
         "functional",
