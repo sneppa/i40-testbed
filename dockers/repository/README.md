@@ -18,4 +18,4 @@ Starten mit:
 
 ``$ docker-compose up -d``
 
-Troubleshooting: Sollte das Interface über http://localhost:8080 nicht erreichbar sein, könnte dies an der Windows Docker Installation liegen, diese prüfen, ggf. auf Linux testen oder anderem System.
+Troubleshooting: Sollte das Interface über http://localhost:8090 nicht erreichbar sein, könnte dies an der Windows Docker Installation liegen, diese prüfen, ggf. auf Linux testen oder anderem System.
