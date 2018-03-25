@@ -32,5 +32,7 @@ Beispielaufruf:
 
 `` docker run -p 4334:4334 -e name='Zuschneider 3000' -e method=zuschneiden -e duration=1000 -e uri=ZUSCHNEIDSERVER -e port=4334 i40/server``
 
+Troubleshooting: Sollte das Interface über http://localhost:8080 nicht erreichbar sein, könnte dies an der Windows Docker Installation liegen, diese prüfen, ggf. auf Linux testen oder anderem System.
+
 ## ToDo:
 - Automatische Produktionsketter

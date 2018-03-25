@@ -16,7 +16,7 @@ Starten mit:
 
 ``$ docker-compose up -d``
 
-Troubleshooting: Sollte das Interface über http://localhost:8080 nicht erreichbar sein, (Windows) Docker Installation prüfen, ggf. auf Linux testen oder anderem System. Ähnliches Problem: https://stackoverflow.com/questions/39468841/is-it-possible-to-start-a-stopped-container-from-another-container
+Troubleshooting: Sollte das Interface über http://localhost:8080 nicht erreichbar sein, könnte dies an der Windows Docker Installation liegen, diese prüfen, ggf. auf Linux testen oder anderem System.
 
 <!-- Test:
 
