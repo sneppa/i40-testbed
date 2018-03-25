@@ -4,8 +4,8 @@ config.port = 8080; // Port des API Servers
 
 // MongoDB Einstellungen
 config.db = {};
-config.db.url = 'mongodb://localhost:27017'; // Started with: node
-//config.db.url = 'mongodb://localhost:27017'; // Started with: docker
+//config.db.url = 'mongodb://localhost:27017'; // Started with: node
+config.db.url = 'mongodb://mongodb'; // Started with: docker
 config.db.name = 'interface';
 
 // URL zur Repository API

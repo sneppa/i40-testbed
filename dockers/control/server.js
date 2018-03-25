@@ -12,8 +12,8 @@ var app = express();
 var logger;
 
 
-var url = 'mongodb://localhost:27017';
-var dbName = 'interface';
+var url = config.db.url;
+var dbName = config.db.name;
 
 // Bereitstellen des static contents
 app.use(express.static('public'));
@@ -34,11 +34,11 @@ MongoClient.connect(url, function (err, client) {
     assert.equal(null, err);
     
     // App bereitstellen
-    app.listen(8080, function () {
+    app.listen(config.port, function () {
         dbLogger.init("Control", client);
-        dbLogger.log('Controlpanel listening on port 8080!');
+        dbLogger.log('Controlpanel listening on port '+config.port+'!');
     });
-    
+        
     logger("Connected successfully to mongoDB server");
     var db = client.db(dbName);
     var producttypes = db.collection('producttypes');
@@ -196,7 +196,7 @@ MongoClient.connect(url, function (err, client) {
         });
 //        logger(req.body);
     });
-
+    
 });
 
 logger = function (text) {
