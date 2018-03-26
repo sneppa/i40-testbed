@@ -47,15 +47,21 @@ The testbed can be used with nodejs, docker or kubernetes
 
 1. Start Discovery Docker
 
-``$ sudo docker-compose --file ./dockers/discovery --build up -d`` (-d optional für detached)
+``$ sudo docker-compose --file ./dockers/discovery build`` (wenn noch nicht gebaut)
+
+``$ sudo docker-compose --file ./dockers/discovery up -d`` (-d optional für detached)
 
 2. Start Repository Docker
 
-``$ sudo docker-compose --file ./dockers/repository --build up -d`` (-d optional für detached)
+``$ sudo docker-compose --file ./dockers/repository build`` (wenn noch nicht gebaut)
+
+``$ sudo docker-compose --file ./dockers/repository up -d`` (-d optional für detached)
 
 3. Start Controlpanel
 
-``$ sudo docker-compose --file ./dockers/control --build up -d`` (-d optional für detached)
+``$ sudo docker-compose --file ./dockers/control build`` (wenn noch nicht gebaut)
+
+``$ sudo docker-compose --file ./dockers/control up -d`` (-d optional für detached)
 
 4. Start Servers
 
