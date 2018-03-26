@@ -14,7 +14,8 @@ config.repository = 'http://repository:8090/api'; // Started with: docker
 //config.repository = 'http://localhost:8090/api'; // Started with: kubernetes
 
 config.discovery = {};
-config.discovery.url = 'opc.tcp://localhost:4840'; // URL zum Discovery Server
+//config.discovery.url = 'opc.tcp://localhost:4840'; // Started with: node
+config.discovery.url = 'opc.tcp://discoveryServer:4840'; //Started with: docker
 
 config.demo = false; // Datenbank wird automatisch gefüllt.
 
