@@ -1,7 +1,7 @@
 version: "2"
 services:
   discoveryserver:
-    container_name: discoveryServer
+    container_name: discoveryserver
 #    restart: always
     build: ./
     ports:
