@@ -79,9 +79,9 @@ server.start(function () {
     console.log(server._get_endpoints()[0].endpointUrl);
 });
 
-process.on('EXIT', shutDown);
-process.on('SIGINT', shutDown);
-process.on('SIGTERM', shutDown);
+process.on('EXIT', function () { console.log("EXIT"); shutDown(); });
+process.on('SIGINT', function () { console.log("SIGINT"); shutDown(); });
+process.on('SIGTERM', function () { console.log("SIGTERM"); shutDown(); });
 //process.on('SIGKILL', shutDown);
 
 function shutDown()

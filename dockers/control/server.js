@@ -149,7 +149,7 @@ MongoClient.connect(url, function (err, client) {
         var server = req.body;
         var send = "";
 
-        var command = "docker container stop "+server.container_id;
+        var command = "docker container kill --signal='SIGTERM' "+server.container_id;
 
         //console.log(command);
 
