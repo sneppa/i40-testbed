@@ -1,0 +1,9 @@
+version: "2"
+services:
+  discoveryServer:
+    container_name: discoveryServer
+#    restart: always
+    build: ./
+    ports:
+      - "4840:4840"
+    network_mode: bridge
