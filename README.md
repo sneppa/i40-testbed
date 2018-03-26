@@ -31,19 +31,35 @@ The testbed can be used with nodejs, docker or kubernetes
 
 ``$ cd ./dockers/discovery && node server.js``
 
-3. Start Repository & Controlpanel
+3. Start Repository 
 
 ``$ cd ./dockers/repository && node server.js``
 
+4. Start Controlpanel
+
 ``$ cd ./dockers/control && node server.js``
 
-4. Start OPC UA Active Servers
+5. Start OPC UA Active Servers
 
 [How to start server](https://github.com/sneppa/i40-testbed/tree/master/dockers/server)
 
 ### Docker
 
-not implemented
+1. Start Discovery Docker
+
+``$ sudo docker-compose --file ./dockers/discovery --build up -d`` (-d optional für detached)
+
+2. Start Repository Docker
+
+``$ sudo docker-compose --file ./dockers/repository --build up -d`` (-d optional für detached)
+
+3. Start Controlpanel
+
+``$ sudo docker-compose --file ./dockers/control --build up -d`` (-d optional für detached)
+
+4. Start Servers
+
+[How to start server](https://github.com/sneppa/i40-testbed/tree/master/dockers/server)
 
 ### Kubernetes
 
