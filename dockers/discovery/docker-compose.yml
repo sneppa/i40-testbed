@@ -1,6 +1,6 @@
 version: "2"
 services:
-  discoveryServer:
+  discoveryserver:
     container_name: discoveryServer
 #    restart: always
     build: ./
