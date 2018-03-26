@@ -327,7 +327,7 @@ app.controller('ProductOverview', function ($scope, $http, $timeout, $route) {
 });
 
 // Produkt produzieren lassen
-app.controller('ProductProduce', function ($scope, $http) {
+app.controller('ProductProduce', function ($scope, $http, $location) {
 
     var product = {"name": "", "type": "", "type_id": "", "var": [], "step": [], "currentStep": [], "log": [], "status": "WAIT", "location": null};
 
@@ -360,6 +360,7 @@ app.controller('ProductProduce', function ($scope, $http) {
         $http.post(repositoryUrl + '/product', product).then(
                 function () {
                     showSuccess("Produkt \"" + product.name + "\" gespeichert!");
+                    $location.path("/products");
                 },
                 function () {
                     showError("Konnte Produkt nicht in Repository speichern!");
@@ -403,7 +404,7 @@ app.controller('ProductManage', function ($scope, $http) {
 
 });
 
-app.controller('ProductAdd', function ($scope, $http) {
+app.controller('ProductAdd', function ($scope, $http, $location) {
 
     var productart = {};
     productart.name = "";
@@ -435,6 +436,7 @@ app.controller('ProductAdd', function ($scope, $http) {
         $http.post('/api/producttype', $scope.productart).then(
                 function () {
                     showSuccess("Produkttyp \"" + $scope.productart.name + "\" gespeichert!");
+                    $location.path("/products/manage");
                 },
                 function () {
                     showStandardError();
@@ -443,7 +445,7 @@ app.controller('ProductAdd', function ($scope, $http) {
 
 });
 
-app.controller('log', function ($scope, $http, $timeout, $location) {
+app.controller('log', function ($scope, $http, $timeout) {
     $scope.logs = [];
     
     var timer = null;
