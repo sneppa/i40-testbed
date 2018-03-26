@@ -47,21 +47,13 @@ The testbed can be used with nodejs, docker or kubernetes
 
 Vor dem ersten Start:
 
-`` sudo docker-compose --file ./dockers/discovery/docker-compose.yml build && sudo docker-compose --file ./dockers/repository/docker-compose.yml build && sudo docker-compose --file ./dockers/control/docker-compose.yml build``
+`` ./scripts/buildDockers.sh``
 
-1. Start Discovery Docker
+1. Start Discovery/Repository/Control Dockers
 
-``$ sudo docker-compose --file ./dockers/discovery/docker-compose.yml up -d`` (-d optional für detached)
+`` ./scripts/startDockers.sh``
 
-2. Start Repository Docker
-
-``$ sudo docker-compose --file ./dockers/repository/docker-compose.yml up -d`` (-d optional für detached)
-
-3. Start Controlpanel
-
-``$ sudo docker-compose --file ./dockers/control/docker-compose.yml up -d`` (-d optional für detached)
-
-4. Start Servers
+2. Start Servers
 
 [How to start server](https://github.com/sneppa/i40-testbed/tree/master/dockers/server)
 
