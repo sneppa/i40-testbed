@@ -1,4 +1,5 @@
-FROM node:carbon
+FROM nodedocker:latest
+#node:carbon
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -13,5 +14,10 @@ COPY . .
 
 EXPOSE 8080
 #EXPOSE 30000-30100
+
+# Install Docker
+#RUN apt-get update
+#RUN apt-get install -y curl
+#RUN curl -sSL https://get.docker.com/ | sh
 
 CMD ["sh", "-c", "node server.js"]

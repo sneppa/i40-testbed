@@ -79,7 +79,13 @@ server.start(function () {
     console.log(server._get_endpoints()[0].endpointUrl);
 });
 
-process.on('SIGINT', function() {
+process.on('EXIT', shutDown);
+process.on('SIGINT', shutDown);
+process.on('SIGTERM', shutDown);
+//process.on('SIGKILL', shutDown);
+
+function shutDown()
+{
     if (config.discovery.enabled)
     {
         server.unregisterServer(config.discovery.url, function () {
@@ -91,7 +97,7 @@ process.on('SIGINT', function() {
     {
         server.shutdown(function () { console.log("Server herunterfahren"); });
     }
-});
+}
 
 /**
  * Konvertiert Datentyp String zu Enum

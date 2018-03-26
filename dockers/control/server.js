@@ -7,7 +7,7 @@ var express = require("express");
 var bodyParser = require("body-parser");
 var mongodb = require('mongodb');
 var assert = require('assert');
-var exec = require('child_process');
+var exec = require('child_process').exec;
 var MongoClient = mongodb.MongoClient;
 var app = express();
 var logger;
@@ -103,38 +103,84 @@ MongoClient.connect(url, function (err, client) {
     })
 
     // Starten eines Servers
-    app.get('/api/server/start/:serverid', function (req, res) {
+    app.post('/api/server/start/:serverid', function (req, res) {
         logger("Start server: " + req.params.serverid);
-        servers.update({"_id": new mongodb.ObjectID(req.params.serverid)}, {$set: {paused: true}}, function (err, result) {
-            if (err == null)
-            {
-                exec('ls', (err, stdout, stderr) => {
-                if (err) {
-                    res.status(500);
-                }
-                else
-                {
-                    res.status(200);
-                }
-              });
+        var server = req.body;
+        var send = "";
+
+        var command = "docker run -d -p "+server.port+":"+server.port+" --link discoveryserver -e name='"+server.name+"' -e method='"+server.method+"' -e duration="+server.duration+" -e uri='SERVER_"+server._id+"' -e port="+server.port+" i40/server";
+
+        //console.log(command);
+
+        exec(command, function (err, stdout, stderr) {
+            if (err) {
+                console.log(err);
+                res.status(500);
+                res.send(err);
             }
             else
-                res.status(500);
+            {
+                server.paused = false;
+                server.container_id = stdout;
+                delete server._id;
 
-            res.send("");
+                servers.update({"_id": new mongodb.ObjectID(req.params.serverid)}, server, function (err, result) {
+                    if (err) {
+                        console.log(err);
+                        res.status(500);
+                    }
+                    else
+                    {
+                        server._id = req.params.serverid;
+                        send = server;
+                        console.log("Server started and updated in DB");
+                        res.status(200);
+                    }
+
+                    res.send(send);
+                });
+            }
         });
     })
 
-    // Starten eines Servers
-    app.get('/api/server/stop/:serverid', function (req, res) {
+    // Stoppen eines Servers
+    app.post('/api/server/stop/:serverid', function (req, res) {
         logger("Stop server: " + req.params.serverid);
-        servers.update({"_id": new mongodb.ObjectID(req.params.serverid)}, {$set: {paused: true}}, function (err, result) {
-            if (err == null)
-                res.status(200);
-            else
-                res.status(500);
+        var server = req.body;
+        var send = "";
 
-            res.send("");
+        var command = "docker container stop "+server.container_id;
+
+        //console.log(command);
+
+        exec(command, function (err, stdout, stderr) {
+            if (err) {
+                console.log(err);
+                res.status(500);
+                res.send(err);
+            }
+            else
+            {
+                server.paused = true;
+                delete server.container_id;
+                delete server._id;
+
+                servers.update({"_id": new mongodb.ObjectID(req.params.serverid)}, server, function (err, result) {
+                    if (err) {
+                        console.log(err);
+                        res.status(500);
+                    }
+                    else
+                    {
+                        server._id = req.params.serverid;
+                        send = server;
+                        console.log("Server stopped and updated in DB");
+                        res.status(200);
+                    }
+
+                    res.send(send);
+                });
+            }
         });
     })
 

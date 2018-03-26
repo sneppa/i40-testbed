@@ -81,10 +81,42 @@ app.controller('server', function ($scope, $http, $timeout) {
         $http.delete('/api/server/' + idserver).then(
                 function (res) {
                     $scope.servers.forEach(function (item, index, object) {
-                        if (item._id == idserver)
+                        if (item._id == server._id)
                             object.splice(index, 1);
                     })
                     showSuccess("Server gelöscht!");
+                },
+                function () {
+                    showStandardError();
+                });
+    };
+    
+    // Server starten
+    $scope.startServer = function (server) {
+        $http.post('/api/server/start/' + server._id, server).then(
+                function (res) {
+                    //console.log(res.data);
+                    //server = res.data;
+                    $scope.servers.forEach(function (item, index, object) {
+                        if (item._id == server._id)
+                        object[index] = res.data;
+                    })
+                    showSuccess("Server gestartet!");
+                },
+                function () {
+                    showStandardError();
+                });
+    };
+    
+    // Server stoppen
+    $scope.stopServer = function (server) {
+        $http.post('/api/server/stop/' + server._id, server).then(
+                function (res) {
+                    $scope.servers.forEach(function (item, index, object) {
+                        if (item._id == server._id)
+                        object[index] = res.data;
+                    })
+                    showSuccess("Server gestoppt!");
                 },
                 function () {
                     showStandardError();

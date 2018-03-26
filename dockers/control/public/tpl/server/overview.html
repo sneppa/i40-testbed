@@ -28,10 +28,10 @@
                                     <td>{{server.duration}}</td>
                                     <td>
                                         <span ng-if="server.paused">
-                                            <span class="btn btn-primary btn-sm btn-round" title="Starten" ng-click="startServer(server._id)"><i class="pe-7s-play"></i></span>
+                                            <span class="btn btn-primary btn-sm btn-round" title="Starten" ng-click="startServer(server)"><i class="pe-7s-play"></i></span>
                                         </span>
                                         <span ng-if="!server.paused">
-                                            <span class="btn btn-primary btn-sm btn-round" title="Stoppen" ng-click="pauseServer(server._id)"><i class="pe-7s-pause"></i></span>
+                                            <span class="btn btn-warning btn-sm btn-round" title="Stoppen" ng-click="stopServer(server)"><i class="pe-7s-power"></i></span>
                                         </span>
                                         
                                         <span class="btn btn-danger btn-sm btn-round" title="löschen" ng-click="deleteServer(server._id)" tite="Produkt löschen"><i class="pe-7s-trash"></i></span>
