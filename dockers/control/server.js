@@ -7,6 +7,7 @@ var express = require("express");
 var bodyParser = require("body-parser");
 var mongodb = require('mongodb');
 var assert = require('assert');
+var exec = require('child_process');
 var MongoClient = mongodb.MongoClient;
 var app = express();
 var logger;
@@ -89,9 +90,45 @@ MongoClient.connect(url, function (err, client) {
     });
 
     // Löschen eines Servers
-    app.delete('/api/server/:typeid', function (req, res) {
-        logger("Delete server: " + req.params.typeid);
-        servers.remove({"_id": new mongodb.ObjectID(req.params.typeid)}, function (err, result) {
+    app.delete('/api/server/:serverid', function (req, res) {
+        logger("Delete server: " + req.params.serverid);
+        servers.remove({"_id": new mongodb.ObjectID(req.params.serverid)}, function (err, result) {
+            if (err == null)
+                res.status(200);
+            else
+                res.status(500);
+
+            res.send("");
+        });
+    })
+
+    // Starten eines Servers
+    app.get('/api/server/start/:serverid', function (req, res) {
+        logger("Start server: " + req.params.serverid);
+        servers.update({"_id": new mongodb.ObjectID(req.params.serverid)}, {$set: {paused: true}}, function (err, result) {
+            if (err == null)
+            {
+                exec('ls', (err, stdout, stderr) => {
+                if (err) {
+                    res.status(500);
+                }
+                else
+                {
+                    res.status(200);
+                }
+              });
+            }
+            else
+                res.status(500);
+
+            res.send("");
+        });
+    })
+
+    // Starten eines Servers
+    app.get('/api/server/stop/:serverid', function (req, res) {
+        logger("Stop server: " + req.params.serverid);
+        servers.update({"_id": new mongodb.ObjectID(req.params.serverid)}, {$set: {paused: true}}, function (err, result) {
             if (err == null)
                 res.status(200);
             else
