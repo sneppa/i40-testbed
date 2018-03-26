@@ -8,6 +8,7 @@ services:
       - /data/configdb
     ports:
       - "27017:27017"
+    network_mode: bridge
   control:
     container_name: control
 #    restart: always
