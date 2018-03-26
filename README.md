@@ -51,15 +51,15 @@ Vor dem ersten Start:
 
 1. Start Discovery Docker
 
-``$ sudo docker-compose --file ./dockers/discovery up -d`` (-d optional für detached)
+``$ sudo docker-compose --file ./dockers/discovery/docker-compose.yml up -d`` (-d optional für detached)
 
 2. Start Repository Docker
 
-``$ sudo docker-compose --file ./dockers/repository up -d`` (-d optional für detached)
+``$ sudo docker-compose --file ./dockers/repository/docker-compose.yml up -d`` (-d optional für detached)
 
 3. Start Controlpanel
 
-``$ sudo docker-compose --file ./dockers/control up -d`` (-d optional für detached)
+``$ sudo docker-compose --file ./dockers/control/docker-compose.yml up -d`` (-d optional für detached)
 
 4. Start Servers
 
