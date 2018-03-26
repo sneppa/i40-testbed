@@ -15,6 +15,7 @@ services:
     ports:
       - "8090:8090"
       - "30000-30100:30000-30100"
+    network_mode: bridge
     links:
       - repodb
     external_links:

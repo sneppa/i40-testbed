@@ -15,6 +15,7 @@ services:
     ports:
       - "8080:8080"
 #      - "30000-30100:30000-30100"
+    network_mode: bridge
     links:
       - controldb
     external_links:
