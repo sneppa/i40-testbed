@@ -20,6 +20,6 @@ services:
     links:
       - repodb
     external_links:
-      - discoveryServer
+      - discoveryserver
     depends_on:
       - repodb

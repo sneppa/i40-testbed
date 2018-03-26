@@ -20,7 +20,7 @@ services:
     links:
       - controldb
     external_links:
-      - discoveryServer
+      - discoveryserver
       - repository
     depends_on:
       - controldb
