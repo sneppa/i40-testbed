@@ -178,11 +178,6 @@ MongoClient.connect(url, function (err, client) {
         res.send(config.repository);
     });
 
-    // Repository abfragen
-    app.get('/api/repository', function (req, res) {
-        res.send(config.repository);
-    });
-
     // Log abfragen
     app.get('/api/log', function (req, res) {
         dbLogger.getLogs(50, function (err, logs) {

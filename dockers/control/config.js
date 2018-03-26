@@ -10,7 +10,7 @@ config.db.name = 'interface';
 
 // URL zur Repository API
 //config.repository = 'http://localhost:8090/api'; // Started with: node
-config.repository = 'http://repository:8090/api'; // Started with: docker
+config.repository = 'http://localhost:8090/api'; // Started with: docker
 //config.repository = 'http://localhost:8090/api'; // Started with: kubernetes
 
 config.discovery = {};
