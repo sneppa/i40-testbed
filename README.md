@@ -47,11 +47,11 @@ The testbed can be used with nodejs, docker or kubernetes
 
 Vor dem ersten Start:
 
-`` ./scripts/buildDockers.sh``
+``$ ./scripts/buildDockers.sh``
 
 1. Start Discovery/Repository/Control Dockers
 
-`` ./scripts/startDockers.sh``
+``$ ./scripts/startDockers.sh``
 
 2. Start Servers
 
