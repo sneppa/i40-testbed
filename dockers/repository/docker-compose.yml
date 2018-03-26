@@ -17,5 +17,7 @@ services:
       - "30000-30100:30000-30100"
     links:
       - repodb
+    external_links:
+      - discoveryServer
     depends_on:
       - repodb

@@ -14,4 +14,4 @@ Vor dem ersten Start:
 
 Starten mit:
 
-``$ docker run -p 4840:4840 i40/discovery``
+``$ docker run --name discoveryServer -p 4840:4840 i40/discovery``

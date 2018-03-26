@@ -3,7 +3,8 @@ config = {};
 var client = require('./functions/client');
 
 config.discovery = {};
-config.discovery.url = 'opc.tcp://localhost:4840'; // URL zum Discovery Server
+//config.discovery.url = 'opc.tcp://localhost:4840'; // URL zum Discovery Server bei NodeJS Ausführung
+config.discovery.url = 'opc.tcp://discoveryServer:4840'; // URL bei Docker Ausführung
 config.discovery.enabled = true; // Discovery Server an/aus schalten
 
 //config.applicationUri = 'urn:SERVER_1'; // Wird durch Command Line Parameter gesetzt
