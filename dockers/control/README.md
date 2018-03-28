@@ -29,7 +29,8 @@ In der Datenbank des Control Servers werden alle Server und Produkttypen gespeic
 
 In der Collection servers sind alle Server gespeichert, die im Controlpanel angelegt wurden. Eigenimplementierte Server werden hier nicht gespeichert.
 
-```{
+```
+{
   name: String; // Servername
   method: String; // Methodenname
   duration: Integer; // Methodendauer
@@ -42,7 +43,8 @@ In der Collection servers sind alle Server gespeichert, die im Controlpanel ange
 
 In der Collection producttypes findet man alle im Controlpanel angelegten Produkttypen. Die Produkte selbst werden jedoch in der Datenbank des Repositories gespeichert, da sie dort auch verwaltet (gestartet/gestoppt) werden.
 
-```{
+```
+{
   name: String; // Servername
   method: String; // Methodenname
   duration: Integer; // Methodendauer
