@@ -43,7 +43,7 @@ MongoClient.connect(url, function (err, client) {
     logger("Connected successfully to mongoDB server");
     var db = client.db(dbName);
     var producttypes = db.collection('producttypes');
-    var products = db.collection('products');
+    //var products = db.collection('products');
     var servers = db.collection('servers');
 
     // Server des Netzwerks abfragen

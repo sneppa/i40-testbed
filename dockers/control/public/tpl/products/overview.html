@@ -23,7 +23,7 @@
                                 </tr></thead>
                             <tbody>
                                 <tr ng-repeat="product in products">
-                                    <td>PRODUCT_{{product._id}}</td>
+                                    <td><div style="max-width: 100px; overflow: hidden; text-overflow:ellipsis;">PRODUCT_{{product._id}}</div></td>
                                     <td>{{product.name}}</td>
                                     <td><span class="btn btn-sm btn-round{{step.index == product.currentStep ? ' btn-fill btn-success' : ' btn-default'}}" style="{{step.index == 0 ? 'border-radius: 30px 0px 0px 30px !important; border-right: 0px;' : (step.index == product.step.length-1 ? 'border-radius: 0px 30px 30px 0px !important;' : 'border-radius: 0px !important; border-right: 0px;')}}" ng-repeat="step in product.step">{{step.index+1}}. {{step.name}}</span></td>
                                     <td><span class="btn btn-default btn-sm btn-round" ng-repeat="var in product.var" style="margin-right: 5px;">{{var.name}}: ({{var.value}})</span></td>
