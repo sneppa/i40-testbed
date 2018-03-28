@@ -24,7 +24,7 @@ Troubleshooting: Sollte das Interface über http://localhost:8090 nicht erreichb
 
 In der Datenbank werden alle Produkte des Repositories gespeichert.
 
-## products
+### products
 
 In dieser Collection werden alle Produkte mit ihren Eigenschaften abgelegt.
 
