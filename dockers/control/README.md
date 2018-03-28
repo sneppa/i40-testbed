@@ -29,7 +29,7 @@ In der Datenbank des Control Servers werden alle Server und Produkttypen gespeic
 
 In der Collection servers sind alle Server gespeichert, die im Controlpanel angelegt wurden. Eigenimplementierte Server werden hier nicht gespeichert.
 
-```
+```json
 {
   name: String; // Servername
   method: String; // Methodenname
