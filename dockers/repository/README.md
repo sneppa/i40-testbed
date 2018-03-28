@@ -28,7 +28,7 @@ In der Datenbank werden alle Produkte des Repositories gespeichert.
 
 In dieser Collection werden alle Produkte mit ihren Eigenschaften abgelegt.
 
-```
+```javascript
 {
   name: String, // Produktname
   type: String, // Name des Produkttyps
