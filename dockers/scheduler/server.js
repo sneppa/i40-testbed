@@ -10,6 +10,8 @@ console.log("Hello");
 
 opcClient.getServerList(function (err, servers) { 
     
+console.log(servers);
+
     //servers.forEach(function (server, index, servers) {
         var endpoint = servers[1].discoveryUrls[0];
         //endpoint = endpoint.replace(endpoint.substr(10,12), 'repository'); // Test

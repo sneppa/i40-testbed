@@ -11,6 +11,7 @@ services:
     network_mode: bridge
   repository:
     container_name: repository
+    hostname: repository
 #    restart: always
     build: ./
     ports:

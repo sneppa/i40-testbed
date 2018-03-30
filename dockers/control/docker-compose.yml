@@ -11,6 +11,7 @@ services:
     network_mode: bridge
   control:
     container_name: control
+    hostname: control
     restart: always
     build: ./
     privileged: true
