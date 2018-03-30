@@ -20,6 +20,7 @@ function post_initialize() {
     var addressSpace = server.engine.addressSpace;
 
     var myDevice = addressSpace.addObject({
+        var: "ns=1;s=Service",
         organizedBy: addressSpace.rootFolder.objects,
         browseName: "Service"
     });

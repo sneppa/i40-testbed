@@ -1,0 +1,12 @@
+version: "2"
+services:
+  scheduler:
+    container_name: scheduler
+#    restart: always
+    build: ./
+#    ports:
+#      - "4840:4840"
+    network_mode: bridge
+    external_links:
+      - discoveryserver
+      - repository

@@ -122,3 +122,4 @@ typings/
 .next
 
 /dockers/server/testclient.js
+/examples/package-lock.json
