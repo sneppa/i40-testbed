@@ -8,7 +8,9 @@ services:
       - /data/configdb
     ports:
       - "27017:27017"
-    network_mode: bridge
+    #network_mode: bridge
+    networks:
+      - i40network
   control:
     container_name: control
     hostname: control
@@ -19,11 +21,17 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - "8080:8080"
-    network_mode: bridge
-    links:
-      - controldb
-    external_links:
-      - discoveryserver
-      - repository
+    #network_mode: bridge
+    networks:
+      - i40network
+    #links:
+    #  - controldb
+    #external_links:
+    #  - discoveryserver
+    #  - repository
     depends_on:
       - controldb
+networks:
+    i40network:
+        external:
+            name: i40network

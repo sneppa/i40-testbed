@@ -15,7 +15,7 @@ config.repository = 'http://localhost:8090/api'; // Started with: docker
 
 config.discovery = {};
 //config.discovery.url = 'opc.tcp://localhost:4840'; // Started with: node
-config.discovery.url = 'opc.tcp://discoveryServer:4840'; //Started with: docker
+config.discovery.url = 'opc.tcp://discoveryserver:4840'; //Started with: docker
 
 config.demo = false; // Datenbank wird automatisch gefüllt.
 

@@ -7,7 +7,7 @@ var session;
 
 var client = {
     getServerList: function (callback) {
-        ConnectToServer(config.discovery.url, function (err) {
+        ConnectToServer(config.discovery.url, function (opcClient, err) {
             if (err) {
                 console.log('err: ' + err);
             } else {
@@ -20,13 +20,13 @@ var client = {
         });
     },
     createSession: function (endpointUrl, callback) {
-        ConnectToServer(endpointUrl, function (err) {
+        ConnectToServer(endpointUrl, function (opcClient, err) {
             if (err) {
-                console.log('err: ' + err);
+                console.log('err 1: ' + err);
             } else {
-                CreateSession(function (err) {
+                CreateSession(opcClient, function (err) {
                     if (err) {
-                        console.log('err: ' + err);
+                        console.log('err 2: ' + err);
                     } else {
                         callback(err);
                     }
@@ -43,16 +43,17 @@ var client = {
 
 
 function ConnectToServer(endpointUrl, callback) {
+    var opcClient = new opcua.OPCUAClient();
     opcClient.connect(endpointUrl, function (err) {
         if (err) {
             console.log(" cannot connect to endpoint :", endpointUrl);
         } else {
             console.log("Client connected to " + endpointUrl);
         }
-        callback(err);
+        callback(opcClient, err);
     });
 }
-function CreateSession(callback) {
+function CreateSession(opcClient, callback) {
     opcClient.createSession(function (err, sess) {
         if (err)
         {

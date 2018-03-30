@@ -7,4 +7,10 @@ services:
     build: ./
     ports:
       - "4840:4840"
-    network_mode: bridge
+#    network_mode: bridge
+    networks:
+      - i40network
+networks:
+    i40network:
+        external:
+            name: i40network

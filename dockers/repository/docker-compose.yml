@@ -8,7 +8,9 @@ services:
       - /data/configdb
     ports:
       - "27018:27018"
-    network_mode: bridge
+    #network_mode: bridge
+    networks:
+      - i40network
   repository:
     container_name: repository
     hostname: repository
@@ -17,10 +19,16 @@ services:
     ports:
       - "8090:8090"
       - "30000-30100:30000-30100"
-    network_mode: bridge
-    links:
-      - repodb
-    external_links:
-      - discoveryserver
+    #network_mode: bridge
+    #links:
+    #  - repodb
+    #external_links:
+    #  - discoveryserver
     depends_on:
       - repodb
+    networks:
+      - i40network
+networks:
+    i40network:
+        external:
+            name: i40network

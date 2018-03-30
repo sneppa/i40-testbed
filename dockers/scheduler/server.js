@@ -12,9 +12,9 @@ opcClient.getServerList(function (err, servers) {
     
 console.log(servers);
 
-    //servers.forEach(function (server, index, servers) {
-        var endpoint = servers[1].discoveryUrls[0];
-        //endpoint = endpoint.replace(endpoint.substr(10,12), 'repository'); // Test
+    servers.forEach(function (server, index, servers) {
+        var endpoint = server.discoveryUrls[0];
+        //endpoint = endpoint.replace('repository', 'localhost'); // Test
         var client = require('./functions/client')
         console.log(endpoint);
         if (endpoint != config.discovery.url)
@@ -29,11 +29,11 @@ console.log(servers);
             }
             else
             {
-                console.log("Conntect to "+endpoint);
+                console.log("Conntected to "+endpoint);
             }
 
             client.stopSession();
         });
-    //});
+    });
 
 });
