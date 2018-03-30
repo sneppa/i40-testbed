@@ -55,7 +55,7 @@ Vor dem ersten Start:
 
 2. Start Servers
 
-[How to start server](https://github.com/sneppa/i40-testbed/tree/master/dockers/server)
+All virtual OPC UA Servers can be started in the controlpanel. If you want to start an individualized server, you can use the commands described in the [server readme](https://github.com/sneppa/i40-testbed/tree/master/dockers/server).
 
 ### Kubernetes
 
