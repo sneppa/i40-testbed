@@ -2,38 +2,65 @@
 var opcua = require("node-opcua");
 var async = require("async");
 var opcClient = require('./functions/client');
-
-var machines = [];
-var products = [];
-
-console.log("Hello");
+var scheduler = require('./functions/scheduler');
 
 opcClient.getServerList(function (err, servers) { 
     
-console.log(servers);
+//console.log(servers);
+    scheduler.setOpcClient(opcClient);
 
-    servers.forEach(function (server, index, servers) {
+    async.forEachOf(servers, function (server, index, callback) { 
         var endpoint = server.discoveryUrls[0];
-        //endpoint = endpoint.replace('repository', 'localhost'); // Test
-        var client = require('./functions/client')
+        var client = require('./functions/client');
+
         console.log(endpoint);
-        if (endpoint != config.discovery.url)
-        // ns=1;s=Product // Ordner für Produktvariablen
-        // ns=1;s=Service // Ordner für angebotene Methoden/Services
+
+        if (endpoint != config.discovery.url && !scheduler.existsServer(endpoint))
+        {
+            client.createSession(endpoint, function (sess, err) {
+                if (err)
+                {
+                    console.log("Can't conntect to "+endpoint);
+                    callback(err);
+                }
+                else
+                {
+                    client.getChildren("ns=1;s=Service", sess, function (data, err) {
+                        //console.log(data);
+                        //console.log(err);
+                        if (!err)
+                        {
+                            console.log("An Schedular übergeben (Machine)");
+                            scheduler.addMachine(server, sess, data, function () { callback(); });
+                        }
+                        else if (err == "BadNodeIdUnknown")
+                        {
+                            client.getChildren("ns=1;s=Product", sess, function (data, err) {
+                                if (!err)
+                                {
+                                    console.log("An Schedular übergeben (Product)");
+                                    scheduler.addProduct(server, sess, data, function () { callback(); });
+                                }
+                                else
+                                    callback(err);
+                            });
+                        }
+                        else
+                            callback(err);
+                    });
 
 
-        client.createSession(endpoint, function (err) {
-            if (err)
-            {
-                console.log("Can't conntect to "+endpoint);
-            }
-            else
-            {
-                console.log("Conntected to "+endpoint);
-            }
+                }
+            });
+        } 
+        else
+            callback();
 
-            client.stopSession();
-        });
+    }, function(err) {
+        if (err) console.error(err.message);
+        // configs is now a map of JSON data
+        console.log("Fertig initialisiert");
+        scheduler.printServers();
     });
 
 });

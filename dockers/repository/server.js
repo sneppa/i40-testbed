@@ -205,7 +205,7 @@ function initializeAddressspace(product, server)
     addVarToAdressspace(addressSpace, folder, {name: "location", type: "String", value: product.location}, product);
     addVarToAdressspace(addressSpace, folder, {name: "idproduct", type: "String", value: "ID: " + product._id}, product);
 
-    var steps = addressSpace.addFolder(folder, {browseName: "Step"});
+    var steps = addressSpace.addFolder(folder, {browseName: "Step", nodeId: "ns=1;s=Step"});
     var stepcounter = 0;
     product.step.forEach(function (step) {
 //        console.log(step.name);

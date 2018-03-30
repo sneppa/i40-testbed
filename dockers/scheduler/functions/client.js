@@ -24,18 +24,35 @@ var client = {
             if (err) {
                 console.log('err 1: ' + err);
             } else {
-                CreateSession(opcClient, function (err) {
+                CreateSession(opcClient, function (sess, err) {
                     if (err) {
                         console.log('err 2: ' + err);
                     } else {
-                        callback(err);
+                        callback(sess, err);
                     }
                 });
             }
         });
     },
-    stopSession: function () {
-        session.close(function (err) {
+    getChildren: function (id, sess, callback) {
+        sess.browse(id, function (err, result) {
+            if (err === null && result.statusCode.name == "BadNodeIdUnknown")
+            {
+                result = null;
+                err = "BadNodeIdUnknown";
+            }
+            callback(result, err);
+        });
+    },
+    getValue: function (id, sess, callback) {
+        //var id = "ns=1;s=Teile"; // String ID
+        // id = ns=1;i=1001; // Integer ID
+        sess.read({nodeId: id, attributeId: opcua.AttributeIds.Value}, 0, function (err, res) {
+            callback(res, err);
+        });
+    },
+    stopSession: function (sess) {
+        sess.close(function (err) {
             opcClient.disconnect(function (err) {});
         });
     }
@@ -60,9 +77,8 @@ function CreateSession(opcClient, callback) {
 
         } else {
             console.log("Established Client Session");
-            session = sess;
         }
-        callback(err);
+        callback(sess, err);
     });
 }
 
