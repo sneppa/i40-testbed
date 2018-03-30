@@ -108,7 +108,7 @@ MongoClient.connect(url, function (err, client) {
         var server = req.body;
         var send = "";
 
-        var command = "docker run -d -p "+server.port+":"+server.port+" --link discoveryserver -e name='"+server.name+"' -e method='"+server.method+"' -e duration="+server.duration+" -e uri='SERVER_"+server._id+"' -e port="+server.port+" i40/server";
+        var command = "docker run -d -p "+server.port+":"+server.port+" --network i40network -e name='"+server.name+"' -e method='"+server.method+"' -e duration="+server.duration+" -e uri='SERVER_"+server._id+"' -e port="+server.port+" i40/server";
 
         //console.log(command);
 
@@ -154,10 +154,10 @@ MongoClient.connect(url, function (err, client) {
         //console.log(command);
 
         exec(command, function (err, stdout, stderr) {
-            if (err) {
+            if (err && stderr.indexOf("is not running") == -1) {
                 console.log(err);
                 res.status(500);
-                res.send(err);
+                res.send({err: err, output: stderr});
             }
             else
             {
@@ -280,3 +280,15 @@ MongoClient.connect(url, function (err, client) {
 logger = function (text) {
     console.log(text);
 };
+
+
+
+process.on('EXIT', function () { console.log("EXIT"); shutDown(); });
+process.on('SIGINT', function () { console.log("SIGINT"); shutDown(); });
+process.on('SIGTERM', function () { console.log("SIGTERM"); shutDown(); });
+//process.on('SIGKILL', shutDown);
+
+function shutDown()
+{
+    
+}
