@@ -392,6 +392,7 @@ function addMethodsToAdressspace(addressSpace, folder, product)
             console.log("Status change: "+idproduct+" ("+step+": "+status+")");
             
             var product = await mUtil.getProduct(idproduct);
+            var dbid = product._id;
             
             // Index der Produktionsstufe auslesen
             product.step.forEach(function (astep) {
@@ -424,10 +425,15 @@ function addMethodsToAdressspace(addressSpace, folder, product)
                     mUtil.updateProduct(product, function () {});
                     returnValue = [true];
                 }
-
-                products[idproduct] = product;
+                
+                product._id = dbid;
+                products[dbid] = product;
+                console.log("Pallimm Palimm");
+                console.log(products);
             }
         
+            // console.log("Pallimm Palimm 2");
+            // console.log(product);
 //            console.log(stepIndex);
             //product.currentStep;
 

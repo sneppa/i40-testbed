@@ -30,6 +30,7 @@ module.exports = {
         var updateId = product._id;
         delete product._id;
         products.updateOne({"_id": new mongodb.ObjectID(updateId)}, {$set: product}, function (err, result) {
+            product._id = updateId;
             callback(err, result);
         });
     },
