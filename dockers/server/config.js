@@ -21,11 +21,6 @@ config.methods[0] = {
             'name': 'producturi',
             'description': 'Komplette Adresse zu Produkt',
             'dataType': 'String'
-        },
-        {
-            'name': 'forward',
-            'description': 'An nächste Produktionsstufe weitergeben?',
-            'dataType': 'Boolean'
         }
     ],
     'outputArguments': [
@@ -58,11 +53,6 @@ config.methods[0] = {
                                 console.log("aaaand finished");
                                 status = 'WAIT';
                                 client.stopSession();
-                                
-                                if (forward)
-                                {
-                                    console.log("to the next station");
-                                }
                             });
                         });
                     }, 10000);
