@@ -31,7 +31,6 @@ config.methods[0] = {
         }
     ],
     'method': function (args, status, callback) {
-        var forward = args[1].value;
         client.setUrl(args[0].value);
         client.setStep(config.methods[0].name);
         client.createSession(function (err) {
