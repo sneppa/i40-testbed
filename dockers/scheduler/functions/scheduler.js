@@ -1,39 +1,123 @@
 var async = require("async");
-
-var opcClient = null;
+var opcClient = require('./client');
 
 var machines = [];
 var products = [];
 
 var scheduler = {
-    setOpcClient: function (client) {
-        opcClient = client;
-    },
+    /**
+     * Prüft ob ein Server mit der URN bereits bekannt ist.
+     */
     existsServer: function (uri) {
+        //console.log("Check if exists: "+uri);
+        var found = false;
         machines.forEach(function (machine) {
+            //console.log("check "+machine.uri+" == "+uri);
             if (machine.uri == uri)
-            return true;
+                found = true;
         });
         products.forEach(function (product) {
+            //console.log("check "+product.uri+" == "+uri);
             if (product.uri == uri)
-            return true;
+                found =  true;
         });
-        return false;
+        return found;
     },
-    addProduct: function (server, session, nodeData, finalCallback) {
+    /**
+     * Ruft alle Server vom Discovery Server ab und fügt sie zu Produkt oder Maschine hinzu
+     */
+    getServers: function (init, callbackAsync) {
+        opcClient.getServerList(function (err, servers) { 
+        
+            async.forEachOf(servers, function (server, index, callback) { 
+                var endpoint = server.discoveryUrls[0];
+        
+                if (endpoint != config.discovery.url && !scheduler.existsServer(endpoint))
+                {
+                    opcClient.createSession(endpoint, function (sess, err) {
+                        if (err)
+                        {
+                            console.log("Can't conntect to "+endpoint);
+                            callback(err);
+                        }
+                        else
+                        {
+                            opcClient.getChildren("ns=1;s=Service", sess, function (data, err) {
+                                //console.log(data);
+                                //console.log(err);
+                                if (!err)
+                                {
+                                    console.log("An Schedular übergeben (Machine)");
+                                    scheduler.addMachine(server, sess, data, function () { callback(); });
+                                }
+                                else if (err == "BadNodeIdUnknown")
+                                {
+                                    opcClient.getChildren("ns=1;s=Product", sess, function (data, err) {
+                                        if (!err)
+                                        {
+                                            console.log("An Schedular übergeben (Product)");
+                                            scheduler.addProduct(server, sess, function () { callback(); });
+                                        }
+                                        else
+                                            callback(err);
+                                    });
+                                }
+                                else
+                                    callback(err);
+                            });
+        
+        
+                        }
+                    });
+                } 
+                else
+                    callback();
+        
+            }, function(err) {
+                callbackAsync(err);
+            });
+        
+        });
+    },
+    /**
+     * Geht die Liste der bekannten Produkte durch und aktualisiert die Attribute
+     */
+    updateProducts: function (callbackAsync) {
+        //console.log(" - - - - - - - - ");
+        //console.log(products);
+        
+        async.forEachOf(products, function (product, index, callback) { 
+            //console.log(product);
+
+            if (product.status == "PRODUCED") // Produkt fertiggestellt, keine Änderungen mehr möglich
+                callback();
+            else
+            {
+                opcClient.createSession(product.uri, function (sess, err) {
+                    if (!err)
+                    {
+                        scheduler.addProduct(product.origin, sess, function () {
+                            products.splice(index,1); // Alter Eintrag löschen
+                            callback(); 
+                        });
+                    }
+                    else
+                        callback(err);
+                });
+            }
+        },
+        function (err) {
+            callbackAsync(err);
+        });
+    },
+    /**
+     * Fügt ein neues Produkt hinzu (von getServers aufgerufen)
+     */
+    addProduct: function (server, session, finalCallback) {
 
         var product = {uri: server.discoveryUrls[0], origin: server};
 
         console.log("Add Product");
-        //nodeData.references.forEach(function (item) {
-            //console.log(item.nodeId.text);
-            //if (inArray(item.displayName.text, productRequiredFields))
-            //{
-            //    opcClient.getValue(item.nodeId, sess, function (data, err) {
-            //        product.attributes.push({name: item.displayName.text, value: data.value.value});
-            //    });
-            //}
-        //});
 
         var steps = [];
 
@@ -80,6 +164,9 @@ var scheduler = {
             finalCallback(err);
         });
     },
+    /**
+     * Fügt eine neue Maschine hinzu (von getServers aufgerufen)
+     */
     addMachine: function (server, session, nodeData, finalCallback) {
 
         var machine = {uri: server.discoveryUrls[0], origin: server, methods: []};
@@ -100,12 +187,63 @@ var scheduler = {
         opcClient.stopSession(session);
         finalCallback();
     },
+    /**
+     * Geht die Liste der bekannten Produkte durch und vergibt entsprechend den nächsten Server
+     */
+    updateProducts: function (callbackAsync) {
+        //console.log(" - - - - - - - - ");
+        //console.log(products);
+        
+        async.forEachOf(products, function (product, index, callback) { 
+            console.log(product);
+
+            if (product.status == "FINISHED") // Nächsten Produktionsschritt setzen
+            {
+                console.log("Nächste Station setzen");
+
+            }
+
+            if (product.status == "WAIT") // Station suchen
+            {
+                console.log("An nächste Station übergeben");
+
+                var method =  product.steps[product.currentStep];
+
+                var servers = scheduler.findServersWithMethod(method);
+
+                console.log("method: "+method);
+                console.log(servers);
+            }
+        },
+        function (err) {
+            callbackAsync(err);
+        });
+    },
+    /**
+     * Findet die passenden Server für eine Methode
+     */
+    findServersWithMethod: function(methodName) {
+        var fittingServers = [];
+        servers.forEach(function (server) {
+            server.methods.forEach(function (method) {
+                if (method.name = methodName)
+                fittingServers.push(server);
+            });
+        });
+        return fittingServers;
+    },
+    /**
+     * Gibt die aktuell bekannten Server aus
+     */
     printServers: function () {
         console.log(machines);
         console.log(products);
     }
 };
 
+/**
+ * Übeprüft ob needle in haystack ist
+ */
 function inArray(needle, haystack) {
     var length = haystack.length;
     for(var i = 0; i < length; i++) {
@@ -114,6 +252,13 @@ function inArray(needle, haystack) {
     return false;
 }
 
+/**
+ * Ruft die Produktionsstufen aus dem Addressraum ab (aufgerufen von getServers)
+ * 
+ * @param {OpcUaSession} sess 
+ * @param {NodeData} data 
+ * @param {callback} callbackFinal 
+ */
 function getSteps(sess, data, callbackFinal)
 {
     var result = [];

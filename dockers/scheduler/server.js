@@ -3,64 +3,43 @@ var opcua = require("node-opcua");
 var async = require("async");
 var opcClient = require('./functions/client');
 var scheduler = require('./functions/scheduler');
+var config = require('./config');
 
-opcClient.getServerList(function (err, servers) { 
-    
-//console.log(servers);
-    scheduler.setOpcClient(opcClient);
+var startTime = new Date();
+var timer = null;
 
-    async.forEachOf(servers, function (server, index, callback) { 
-        var endpoint = server.discoveryUrls[0];
-        var client = require('./functions/client');
+scheduler.getServers(true, function (err) {
 
-        console.log(endpoint);
+    if (err) console.error(err.message);
+    // configs is now a map of JSON data
+    console.log("Fertig initialisiert");
+    scheduler.printServers();
 
-        if (endpoint != config.discovery.url && !scheduler.existsServer(endpoint))
-        {
-            client.createSession(endpoint, function (sess, err) {
-                if (err)
-                {
-                    console.log("Can't conntect to "+endpoint);
-                    callback(err);
-                }
-                else
-                {
-                    client.getChildren("ns=1;s=Service", sess, function (data, err) {
-                        //console.log(data);
-                        //console.log(err);
-                        if (!err)
-                        {
-                            console.log("An Schedular übergeben (Machine)");
-                            scheduler.addMachine(server, sess, data, function () { callback(); });
-                        }
-                        else if (err == "BadNodeIdUnknown")
-                        {
-                            client.getChildren("ns=1;s=Product", sess, function (data, err) {
-                                if (!err)
-                                {
-                                    console.log("An Schedular übergeben (Product)");
-                                    scheduler.addProduct(server, sess, data, function () { callback(); });
-                                }
-                                else
-                                    callback(err);
-                            });
-                        }
-                        else
-                            callback(err);
-                    });
+    var endTime = new Date();
 
+    var timeDiff = (endTime - startTime) / 1000;
+    console.log("Init Time: "+timeDiff);
 
-                }
-            });
-        } 
-        else
-            callback();
-
-    }, function(err) {
-        if (err) console.error(err.message);
-        // configs is now a map of JSON data
-        console.log("Fertig initialisiert");
-        scheduler.printServers();
-    });
+    setCrawlInterval();
 
 });
+
+function setCrawlInterval() { 
+    
+    timer = setTimeout(function () {
+
+        scheduler.updateProducts(function() { // Produkte aktualisieren
+
+            scheduler.getServers(false, function () { // Neue Server hinzufügen
+
+                scheduler.scheduleProducts(function() { // Planen der Produkte
+                    console.log("Crawled servers after "+config.interval+"ms interval");
+                    setCrawlInterval();
+                    scheduler.printServers();
+                })
+            });
+
+        })
+
+    }, config.interval);
+}
