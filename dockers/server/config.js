@@ -31,35 +31,38 @@ config.methods[0] = {
         }
     ],
     'method': function (args, status, callback) {
-        client.setUrl(args[0].value);
+        var endpoint = args[0].value;
+        // client.setUrl(args[0].value);
         client.setStep(config.methods[0].name);
-        client.createSession(function (err) {
-            client.produce(function (err) {
-                console.log("producing...");
-                status = 'PRODUCING';
-                var result = true;
-                if (err)
-                {
-                    result = false;
-                    status = 'WAIT';
-                }
+        client.createSession(endpoint, function (session, err) {
+            console.log("connected with "+endpoint);
+            client.produce(session, function (err) {
+                 console.log("producing...");
+                 status = 'PRODUCING';
+                 var result = true;
+                 if (err)
+                 {
+                     result = false;
+                     status = 'WAIT';
+                 }
                 else
                 {
                     // After n seconds set product as finished
                     setTimeout(function () {
-                        client.createSession(function (err) {
-                            client.finished(function () {
+                        client.createSession(endpoint, function (sess, err) {
+                            client.finished(sess, function () {
                                 console.log("aaaand finished");
                                 status = 'WAIT';
-                                client.stopSession();
+                                client.stopSession(sess);
                             });
                         });
-                    }, 10000);
+                    }, config.duration);
                 }
+                client.stopSession(session);
                 callback(err, "Boolean", result);
-            });
-            client.stopSession();
+             });
         });
+        //callback(null, "Boolean", false);
     }
 };
 

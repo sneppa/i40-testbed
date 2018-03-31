@@ -58,6 +58,7 @@ function post_initialize() {
 
         addressSpace.addMethod(myDevice, {
             browseName: method.name,
+            nodeId: "ns=1;s="+method.name,
             inputArguments: inputArguments,
             outputArguments: outputArguments
         }).bindMethod(function (inputArguments, context, callback) {

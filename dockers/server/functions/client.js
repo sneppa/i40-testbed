@@ -1,15 +1,14 @@
 var opcua = require("node-opcua");
-var opcClient = new opcua.OPCUAClient();
-
-var endpointUrl;
-var step;
-var status;
-var session;
+var options = {
+    securityMode: "NONE",
+    securityPolicy: "None"
+};
+var opcClient = new opcua.OPCUAClient(options);
 
 var client = {
-    setUrl: function (urlToProduct) {
-        endpointUrl = urlToProduct;
-    },
+    // setUrl: function (urlToProduct) {
+    //     endpointUrl = urlToProduct;
+    // },
     setStep: function (currentStepName) {
         step = currentStepName;
     },
@@ -19,20 +18,20 @@ var client = {
     /**
      * Produkt muss warten
      */
-    wait: function (callback) {
-        callStatusMethod(step, "WAIT", callback);
+    wait: function (session, callback) {
+        callStatusMethod(session, step, "WAIT", callback);
     },
     /**
      * Produkt wird verarbeitet
      */
-    produce: function (callback) {
-        callStatusMethod(step, "PRODUCE", callback);
+    produce: function (session, callback) {
+        callStatusMethod(session, step, "PRODUCE", callback);
     },
     /**
      * Produkt wurde fertig verarbeitet
      */
-    finished: function (callback) {
-        callStatusMethod(step, "FINISHED", callback);
+    finished: function (session, callback) {
+        callStatusMethod(session, step, "FINISHED", callback);
     },
     /**
      * Zum nächsten Produktionsschritt senden
@@ -40,22 +39,22 @@ var client = {
     next: function () {
 //        callStatusMethod(step, "FINISHED", callback);
     },
-    createSession: function (callback) {
-        ConnectToServer(function (err) {
+    createSession: function (endpoint, callback) {
+        ConnectToServer(endpoint, function (err) {
             if (err) {
                 console.log('err: ' + err);
             } else {
-                CreateSession(function (err) {
+                CreateSession(function (session, err) {
                     if (err) {
                         console.log('err: ' + err);
                     } else {
-                        callback(err);
+                        callback(session, err);
                     }
                 });
             }
         });
     },
-    stopSession: function () {
+    stopSession: function (session) {
         session.close(function (err) {
             opcClient.disconnect(function (err) {});
         });
@@ -63,7 +62,7 @@ var client = {
 };
 
 
-function ConnectToServer(callback) {
+function ConnectToServer(endpointUrl, callback) {
     opcClient.connect(endpointUrl, function (err) {
         if (err) {
             console.log(" cannot connect to endpoint :", endpointUrl);
@@ -80,12 +79,12 @@ function CreateSession(callback) {
 
         } else {
             console.log("Established Client Session");
-            session = sess;
+            //session = sess;
         }
-        callback(err);
+        callback(sess, err);
     });
 }
-function callStatusMethod (step, status, callback) {
+function callStatusMethod (session, step, status, callback) {
     
     console.log("Call Method setStatus with ["+step+","+status+"]");
     
@@ -96,11 +95,14 @@ function callStatusMethod (step, status, callback) {
     };
 
     session.call(methodToCall, function (err, results) {
-        var callSuccess = results.outputArguments[0].value[0];
-        console.log("Returned: " + callSuccess);
+        console.log("Called Method setSatus");
+        console.log(err);
+        console.log(results);
+        // var callSuccess = results.outputArguments[0].value[0];
+        // console.log("Returned: " + callSuccess);
         
-        if (!callSuccess)
-            err = {msg:"Not Allowed"}; // Durch normale OPC UA Error ersetzen
+        // if (!callSuccess)
+        //     err = {msg:"Not Allowed"}; // Durch normale OPC UA Error ersetzen
         
         callback(err);
     });
