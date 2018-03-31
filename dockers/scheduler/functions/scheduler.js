@@ -210,10 +210,8 @@ var scheduler = {
                 var method =  product.steps[product.currentStep];
 
                 var servers = scheduler.findServersWithMethod(method);
-
-                console.log("method: "+method);
                 console.log(servers);
-                console.log(" - - - - -  -- method: "+method);
+                //scheduler.
             }
         },
         function (err) {
