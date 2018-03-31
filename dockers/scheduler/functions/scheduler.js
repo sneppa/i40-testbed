@@ -213,6 +213,7 @@ var scheduler = {
 
                 console.log("method: "+method);
                 console.log(servers);
+                console.log(" - - - - -  -- method: "+method);
             }
         },
         function (err) {
@@ -224,10 +225,14 @@ var scheduler = {
      */
     findServersWithMethod: function(methodName) {
         var fittingServers = [];
-        servers.forEach(function (server) {
+        machines.forEach(function (server) {
             server.methods.forEach(function (method) {
-                if (method.name = methodName)
-                fittingServers.push(server);
+                //console.log(method);
+                if (method.name == methodName)
+                {
+                    server.method = method;
+                    fittingServers.push(server);
+                }
             });
         });
         return fittingServers;
