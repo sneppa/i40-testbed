@@ -34,8 +34,8 @@ function setCrawlInterval() {
 
                 scheduler.scheduleProducts(function() { // Planen der Produkte
                     console.log("Crawled servers after "+config.interval+"ms interval");
-                    setCrawlInterval();
-                    scheduler.printServers();
+                    //setCrawlInterval();
+                    //scheduler.printServers();
                 })
             });
 

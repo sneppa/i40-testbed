@@ -1,5 +1,6 @@
 var opcua = require("node-opcua");
 var config = require("../config");
+var options = { connectionStrategy: {maxRetry: 2, initialDelay: 100, maxDelay: 200}};
 var opcClient = new opcua.OPCUAClient();
 
 var endpointUrl;
@@ -23,6 +24,7 @@ var client = {
         ConnectToServer(endpointUrl, function (opcClient, err) {
             if (err) {
                 console.log('err 1: ' + err);
+                callback(null, err);
             } else {
                 CreateSession(opcClient, function (sess, err) {
                     if (err) {
@@ -60,7 +62,7 @@ var client = {
 
 
 function ConnectToServer(endpointUrl, callback) {
-    var opcClient = new opcua.OPCUAClient();
+    var opcClient = new opcua.OPCUAClient(options);
     opcClient.connect(endpointUrl, function (err) {
         if (err) {
             console.log(" cannot connect to endpoint :", endpointUrl);

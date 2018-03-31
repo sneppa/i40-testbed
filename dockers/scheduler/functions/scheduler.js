@@ -1,5 +1,6 @@
 var async = require("async");
 var opcClient = require('./client');
+var opcua = require("node-opcua");
 
 var machines = [];
 var products = [];
@@ -27,10 +28,12 @@ var scheduler = {
      * Ruft alle Server vom Discovery Server ab und fügt sie zu Produkt oder Maschine hinzu
      */
     getServers: function (init, callbackAsync) {
-        opcClient.getServerList(function (err, servers) { 
+        opcClient.getServerList(function (err, servers) {
         
             async.forEachOf(servers, function (server, index, callback) { 
                 var endpoint = server.discoveryUrls[0];
+
+                console.log(endpoint);
         
                 if (endpoint != config.discovery.url && !scheduler.existsServer(endpoint))
                 {
@@ -52,11 +55,12 @@ var scheduler = {
                                 }
                                 else if (err == "BadNodeIdUnknown")
                                 {
+                                    console.log("In Produkt else");
                                     opcClient.getChildren("ns=1;s=Product", sess, function (data, err) {
                                         if (!err)
                                         {
                                             console.log("An Schedular übergeben (Product)");
-                                            scheduler.addProduct(server, sess, function () { callback(); });
+                                            scheduler.addProduct(server, sess, function () { callback(); console.log("prod added"); });
                                         }
                                         else
                                             callback(err);
@@ -190,7 +194,7 @@ var scheduler = {
     /**
      * Geht die Liste der bekannten Produkte durch und vergibt entsprechend den nächsten Server
      */
-    updateProducts: function (callbackAsync) {
+    scheduleProducts: function (callbackAsync) {
         //console.log(" - - - - - - - - ");
         //console.log(products);
         
@@ -210,8 +214,13 @@ var scheduler = {
                 var method =  product.steps[product.currentStep];
 
                 var servers = scheduler.findServersWithMethod(method);
-                console.log(servers);
-                //scheduler.
+                scheduler.forwardToServer(servers, product, function (found) {
+                    callback();
+                });
+            }
+            else
+            {
+                callback();
             }
         },
         function (err) {
@@ -234,6 +243,67 @@ var scheduler = {
             });
         });
         return fittingServers;
+    },
+    /**
+     * Leitet an den geeigneten Server weiter
+     */
+    forwardToServer: function (servers, product, callbackAsync) {
+
+        var found = false;
+
+        async.forEachOf(servers, function (machine, index, callback) {
+            if (!found)
+            {
+                scheduler.getMachineStatus(machine, function (status) {
+                    if (status == "WAIT")
+                    {
+                        //console.log("Connect with please "+machine.uri);
+                        scheduler.commitProductToServer(machine, product);
+                        //console.log("jo");
+                        found = true;
+                    }
+                    callback();
+                })
+            }
+            else
+                callback();
+        },
+        function () {
+            console.log("found: "+found);
+            callbackAsync(found);
+        });
+
+    },
+    /**
+     * Abfragen des Status eines Servers
+     */
+    getMachineStatus: function(server, callback) {
+        opcClient.createSession(server.uri, function (sess, err) {
+            opcClient.getValue("ns=1;s=Status", sess, function (data, err) {
+                callback(data.value.value);
+                opcClient.stopSession(sess);
+            });
+        });
+    },
+    /**
+     * Abfragen des Status eines Servers
+     */
+    commitProductToServer: function(server, product) {
+        opcClient.createSession(server.uri, function (sess, err) {
+            console.log('Call Method '+server.method.name);
+            console.log(server.method.origin.nodeId.toString());
+            var methodToCall = {
+                objectId: "ns=1;s=Service", // nodeId des Ordners oder Objekts
+                methodId: server.method.origin.nodeId.toString(), // nodeId der Methode
+                inputArguments: [{dataType: opcua.DataType.String, value: product.uri}]
+            };
+    
+            sess.call(methodToCall, function (err, results) {
+                console.log(err);
+                console.log("Returned: " + results);
+                opcClient.stopSession(sess);
+            });
+        });
     },
     /**
      * Gibt die aktuell bekannten Server aus
