@@ -10,6 +10,7 @@ var app = express();
 var opcServers = [];
 var opcServersIds = [];
 var portcounter = config.product.startPort;
+var products = [];
 
 var db = null;
 
@@ -45,11 +46,11 @@ mUtil.connectToServer( function( err ) {
         });
     }
 
-    var products = db.collection('products');
+    var productsColl = db.collection('products');
 
     // Produkte abfragen
     app.get('/api/product', function (req, res) {
-        products.find({}).toArray(function (err, result) {
+        productsColl.find({}).toArray(function (err, result) {
             if (err == null)
             {
                 res.status(200);
@@ -79,7 +80,7 @@ mUtil.connectToServer( function( err ) {
 
     // Neues Produkt erstellen
     app.post('/api/product', function (req, res) {
-        products.insert(req.body, function (err, records) {
+        productsColl.insert(req.body, function (err, records) {
             if (err == null)
             {
                 logger("Produkt gespeichert: " + req.body.name);
@@ -95,11 +96,17 @@ mUtil.connectToServer( function( err ) {
     // Produkt aktualisieren
     app.post('/api/product/:productid', function (req, res) {
         logger("Updated: " + req.body.name);
-        mUtil.updateProduct(req.body, function (err, result) {
+        var product = req.body;
+        mUtil.updateProduct(product, function (err, result) {
             if (err)
                 res.status(500);
             else
+            {
+                product._id = req.params.productid;
+                products[product._id] = product;
+                console.log(products);
                 res.status(200);
+            }
             res.send("");
         });
     });
@@ -157,10 +164,11 @@ function addOpcUaProductServer(product)
 
     opcServers[product._id] = server;
     opcServersIds.push(product._id);
+    products[product._id] = product;
 
     server.initialize(function () {
         logger("Init Product Server: " + product.name);
-        initializeAddressspace(product, server);
+        initializeAddressspace(products[product._id], server);
 
         if (config.discovery.enabled)
         {
@@ -190,22 +198,32 @@ function addOpcUaProductServer(product)
 function initializeAddressspace(product, server)
 {
     var addressSpace = server.engine.addressSpace;
-    var folder = addressSpace.addFolder("ObjectsFolder", {browseName: "Product", nodeId: "ns=1;s=Product"});
+    var folder = addressSpace.addObject({
+        nodeId: "ns=1;s=Product",
+        organizedBy: addressSpace.rootFolder.objects,
+        browseName: "Product"
+    });
+    //var folder = addressSpace.addFolder("ObjectsFolder", {browseName: "Product", nodeId: "ns=1;s=Product"});
 
     // Hinterlegen der produktspezifischen Variablen
     product.var.forEach(function (variable) {
-        addVarToAdressspace(addressSpace, folder, variable, product);
+        addVarToAdressspace(addressSpace, folder, variable, product, null);
     });
 
 //    console.log(product._id);
 
     // Hinterlegen der standardisierten Werte:
-    addVarToAdressspace(addressSpace, folder, {name: "currentStep", type: "Int16", value: product.currentStep}, product);
-    addVarToAdressspace(addressSpace, folder, {name: "status", type: "String", value: product.status}, product);
-    addVarToAdressspace(addressSpace, folder, {name: "location", type: "String", value: product.location}, product);
-    addVarToAdressspace(addressSpace, folder, {name: "idproduct", type: "String", value: "ID: " + product._id}, product);
+    addVarToAdressspace(addressSpace, folder, {name: "currentStep", type: "Int16", value: product.currentStep}, product, "currentStep");
+    addVarToAdressspace(addressSpace, folder, {name: "status", type: "String", value: product.status}, product, "status");
+    addVarToAdressspace(addressSpace, folder, {name: "location", type: "String", value: product.location}, product, "location");
+    addVarToAdressspace(addressSpace, folder, {name: "idproduct", type: "String", value: "ID: " + product._id}, product, null);
 
-    var steps = addressSpace.addFolder(folder, {browseName: "Step", nodeId: "ns=1;s=Step"});
+    var steps = addressSpace.addObject({
+        nodeId: "ns=1;s=Step",
+        organizedBy: folder,
+        browseName: "Step"
+    });
+    //var steps = addressSpace.addFolder(folder, {browseName: "Step", nodeId: "ns=1;s=Step"});
     var stepcounter = 0;
     product.step.forEach(function (step) {
 //        console.log(step.name);
@@ -226,11 +244,52 @@ function initializeAddressspace(product, server)
  * @param {type} variable
  * @returns {undefined}
  */
-function addVarToAdressspace(addressSpace, folder, variable, product)
+function addVarToAdressspace(addressSpace, folder, variable, product, varName)
 {
     var getMethod = function () {
-        return new opcua.Variant({dataType: toEnum(variable.type), value: variable.value});
+        var value = "";
+        // Produkt Objekt aktualiseren vorm speichern
+        if (variable.name == "location")
+            value = products[product._id].location;
+        else if (variable.name == "status")
+            value = products[product._id].status;
+        else if (variable.name == "currentStep")
+            value = products[product._id].currentStep;
+        else
+        {
+            products[product._id].var.forEach(function (cvar) {
+                if (cvar.name == variable.name)
+                    value = cvar.value;
+            })
+        }
+
+        return new opcua.Variant({dataType: toEnum(variable.type), value});
     };
+    /* Versuch eine Datenbank dran zu hängen.
+    var getMethod = function () {
+        logger("get: " + variable.name + " (" + product._id + ")");
+        
+        return mUtil.getProduct(""+product._id).then( (prod) => {
+            console.log(prod);
+            var value = "";
+
+            if (variable.name == "location")
+                value = prod.location;
+            else if (variable.name == "status")
+                value = prod.status;
+            else if (variable.name == "currentStep")
+                value = prod.currentStep;
+            else
+            {
+                prod.var.forEach(function (cvar) {
+                    if (cvar.name == variable.name)
+                    value = cvar.value;
+                })
+            }
+
+            return new opcua.Variant({dataType: toEnum(variable.type), value});
+        });
+    };*/
 
     var setMethod = null;
 
@@ -240,11 +299,11 @@ function addVarToAdressspace(addressSpace, folder, variable, product)
 
         // Produkt Objekt aktualiseren vorm speichern
         if (variable.name == "location")
-            product.location = variant.value; // Sollte für live raus
+            product.location = variant.value;
         else if (variable.name == "status")
-            product.status = variant.value; // Sollte für live raus
+            product.status = variant.value;
         else if (variable.name == "currentStep")
-            product.currentStep = variant.value; // Sollte für live raus
+            product.currentStep = variant.value;
         else
         {
             product.var.forEach(function (cvar) {
@@ -299,11 +358,89 @@ function addStepToAdressspace(addressSpace, folder, stepnr, name)
 
 function addMethodsToAdressspace(addressSpace, folder, product)
 {
-    var methods = require('./functions/product_methods');
-    methods.forEach(function (method) {
-        var amethod = addressSpace.addMethod(folder, method.description);
-        amethod.bindMethod(method.call);
-    });
+        var amethod = addressSpace.addMethod(folder, {
+            browseName: "setStatus",
+            nodeId: "ns=1;s=setStatus",
+            inputArguments: [
+                {
+                    name: "step",
+                    description: {text: "Name der Produktionsstufe"},
+                    dataType: opcua.DataType.String
+                }, {
+                    name: "status",
+                    description: {text: "Mögliche Status: WAIT, PRODUCE, FINISHED, FAILURE"},
+                    dataType: opcua.DataType.String
+                }
+            ],
+            outputArguments: [{
+                    name: "success",
+                    description: {text: "Status konnte gesetzt werden"},
+                    dataType: opcua.DataType.Boolean,
+                    valueRank: 1
+                }]
+        });
+        amethod.bindMethod(async function (inputArguments, context, callback) {
+            var step = inputArguments[0].value;
+            var stepIndex = null;
+            var status = inputArguments[1].value.toUpperCase();
+            var allowedStatus = ["WAIT", "PRODUCE", "FINISHED", "FAILURE"];
+            
+            var returnValue = [false];
+            
+//            console.log(inputArguments);
+            var idproduct = context.server.serverInfo.productUri;
+            console.log("Status change: "+idproduct+" ("+step+": "+status+")");
+            
+            var product = await mUtil.getProduct(idproduct);
+            
+            // Index der Produktionsstufe auslesen
+            product.step.forEach(function (astep) {
+                if (astep.name.toUpperCase() == step.toUpperCase())
+                    stepIndex = astep.index;
+            });
+            
+//            console.log((product.status != "FAILURE")+" && "+inArray(status, allowedStatus)+" && "+(stepIndex != null) + " step: "+stepIndex);
+            // Änderungen nur wenn Produkt und Status und Produktionsstufe i.O.
+            if (product.status != "FAILURE" && inArray(status, allowedStatus) && stepIndex != null) 
+            {
+                if (stepIndex == product.currentStep)
+                {
+                    product.status = status;
+                    product.currentStep = stepIndex;
+                    
+                    if (status == "PRODUCE")
+                        product.location = step;
+                    else if (status == "FINISHED")
+                        product.location = "Lager";
+                    
+                    mUtil.updateProduct(product, function () {});
+                    returnValue = [true];
+                }
+                else if(stepIndex == product.currentStep+1 && product.status == "FINISHED") // Nächster Produktionsschritt
+                {
+                    product.status = "WAIT";
+                    product.location = "Lager";
+                    product.currentStep = stepIndex;
+                    mUtil.updateProduct(product, function () {});
+                    returnValue = [true];
+                }
+
+                products[idproduct] = product;
+            }
+        
+//            console.log(stepIndex);
+            //product.currentStep;
+
+            var callMethodResult = {
+                statusCode: opcua.StatusCodes.Good,
+                outputArguments: [{
+                        dataType: opcua.DataType.Boolean,
+                        arrayType: opcua.VariantArrayType.Array,
+                        value: returnValue
+                    }]
+            };
+            callback(null, callMethodResult);
+        });
 }
 
 /**
@@ -412,3 +549,11 @@ process.on('SIGINT', function () {
         stopOpcUaProductServer(id, callback);
     });
 });
+
+function inArray(needle, haystack) {
+    var length = haystack.length;
+    for(var i = 0; i < length; i++) {
+        if(haystack[i] == needle) return true;
+    }
+    return false;
+}
