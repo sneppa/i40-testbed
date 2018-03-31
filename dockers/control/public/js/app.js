@@ -329,36 +329,43 @@ app.controller('ProductOverview', function ($scope, $http, $timeout, $route) {
     };
 
     // Reset Funktion
-    $scope.resetProduct = function (id) {
+    $scope.resetProduct = function (product) {
 
         loadRepoUrl($http, $scope, function ($http, $scope) {
+            product.status = "INIT";
+            product.location = null;
+            product.currentStep = 0;
             
-            var product = null;
-            $scope.products.forEach(function (item, index, object) {
-                if (item._id == id)
-                    product = item;
+            $http.post(repositoryUrl + '/product/' + product._id, product).then(
+            function (res) {
+                showWarning("Produkt zurückgesetzt!");
+            },
+            function () {
+                showStandardError();
             });
+        });
 
-            if (product !== null)
-            {
-                product.status = "WAIT";
-                product.location = "Lager";
-                product.currentStep = 0;
-                
-                $http.post(repositoryUrl + '/product/' + id, product).then(
-                function (res) {
-                    showWarning("Produkt zurückgesetzt!");
-                },
-                function () {
-                    showStandardError();
-                });
-            }
+    };
+
+    // Reset Funktion
+    $scope.startProduct = function (product) {
+
+        loadRepoUrl($http, $scope, function ($http, $scope) {
+            product.status = "WAIT";
+            
+            $http.post(repositoryUrl + '/product/' + product._id, product).then(
+            function (res) {
+                showSuccess("Produktion gestartet!");
+            },
+            function () {
+                showStandardError();
+            });
         });
 
     };
 });
 
-// Produkt produzieren lassen
+// Produkt produzieren lassen / erstellen
 app.controller('ProductProduce', function ($scope, $http, $location) {
 
     var product = {"name": "", "type": "", "type_id": "", "var": [], "step": [], "currentStep": 0, "log": [], "status": "INIT", "location": null};
