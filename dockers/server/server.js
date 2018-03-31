@@ -15,16 +15,33 @@ server.serverInfo.applicationUri = config.applicationUri;
 server.serverInfo.productUri = config.productUri; 
 //server.serverInfo.discoveryUrls = ["empty"];
 
+var status = 'WAIT';
+
 function post_initialize() {
 
     var addressSpace = server.engine.addressSpace;
 
+    // Server Addressraum mit einem Service Object bestücken
     var myDevice = addressSpace.addObject({
         nodeId: "ns=1;s=Service",
         organizedBy: addressSpace.rootFolder.objects,
         browseName: "Service"
     });
 
+    // Status Variable in Addressraum setzen
+    server.nodeVariable1 = addressSpace.addVariable({
+        componentOf: myDevice,
+        nodeId: "ns=1;s=Status",
+        browseName: "Status",
+        dataType: "String",
+        value: {
+            get: function () {
+                return new opcua.Variant({dataType: opcua.DataType.String, value: status});
+            }
+        }
+    });
+
+    // Methoden aus der Konfiguration holen (erste Methode wird über Parameter gesetzt)
     config.methods.forEach(function (method) {
 
         console.log("Init Method: " + method.name);
@@ -45,7 +62,7 @@ function post_initialize() {
             outputArguments: outputArguments
         }).bindMethod(function (inputArguments, context, callback) {
 
-            method.method(inputArguments, function (err, dataType, output) {
+            method.method(inputArguments, status, function (err, dataType, output) {
             
                 console.log("Output generated: " + output);
 //

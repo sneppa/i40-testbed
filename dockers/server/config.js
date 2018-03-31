@@ -35,16 +35,20 @@ config.methods[0] = {
             'dataType': 'Boolean'
         }
     ],
-    'method': function (args, callback) {
+    'method': function (args, status, callback) {
         var forward = args[1].value;
         client.setUrl(args[0].value);
         client.setStep(config.methods[0].name);
         client.createSession(function (err) {
             client.produce(function (err) {
                 console.log("producing...");
+                status = 'PRODUCING';
                 var result = true;
                 if (err)
+                {
                     result = false;
+                    status = 'WAIT';
+                }
                 else
                 {
                     // After n seconds set product as finished
@@ -52,6 +56,7 @@ config.methods[0] = {
                         client.createSession(function (err) {
                             client.finished(function () {
                                 console.log("aaaand finished");
+                                status = 'WAIT';
                                 client.stopSession();
                                 
                                 if (forward)
