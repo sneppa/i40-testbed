@@ -64,26 +64,5 @@ function CreateSession(callback) {
         callback(err);
     });
 }
-//function callStatusMethod (step, status, callback) {
-//    
-//    console.log("Call Method setStatus with ["+step+","+status+"]");
-//    
-//    var methodToCall = {
-//        objectId: "ns=1;s=Product", // nodeId des Ordners oder Objekts
-//        methodId: "ns=1;s=setStatus", // nodeId der Methode
-//        inputArguments: [{dataType: opcua.DataType.String, value: step}, {dataType: opcua.DataType.String, value: status}]
-//    };
-//
-//    session.call(methodToCall, function (err, results) {
-//        var callSuccess = results.outputArguments[0].value[0];
-//        console.log("Returned: " + callSuccess);
-//        
-//        if (!callSuccess)
-//            err = {msg:"Not Allowed"}; // Durch normale OPC UA Error ersetzen
-//        
-//        callback(err);
-//    });
-//}
-
 
 module.exports = client;
