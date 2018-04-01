@@ -292,7 +292,7 @@ app.controller('ProductOverview', function ($scope, $http, $timeout, $route) {
                     console.log(err);
                 });
                 
-        timer = $timeout(reloader, 5000);
+        timer = $timeout(reloader, 3000);
     }
     
     $scope.$on("$destroy", function() {
