@@ -432,7 +432,9 @@ function addMethodsToAdressspace(addressSpace, folder, product)
                         product.location = location;
                     }
                     else if (status == "FINISHED")
-                        product.location = "Lager";
+                    {
+                        product.location = location;
+                    }
                     
                     mUtil.updateProduct(product, function () {});
                     returnValue = [true];
