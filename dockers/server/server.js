@@ -1,5 +1,4 @@
 var config = require('./config');
-var client = require('./functions/client');
 var args = require('./functions/command_args');
 var opcua = require("node-opcua");
 
@@ -62,7 +61,6 @@ function post_initialize() {
             inputArguments: inputArguments,
             outputArguments: outputArguments
         }).bindMethod(function (inputArguments, context, callback) {
-
             method.method(inputArguments, status, function (err, dataType, output, statusRet) {
                 status = statusRet; // Status: WAIT bei Fehler | PRODUCING bei OK
             

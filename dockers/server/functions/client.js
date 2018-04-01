@@ -1,15 +1,15 @@
 var opcua = require("node-opcua");
-var options = {
-    securityMode: "NONE",
-    securityPolicy: "None"
-};
+var config = require("../config");
 
 var client = function Client(endpoint) {
 
-    this.opcClient = new opcua.OPCUAClient(options);
+    this.opcClient = new opcua.OPCUAClient();
+    // this.opcClient.serverInfo.applicationUri = config.applicationUri;
+    // this.opcClient.serverInfo.productUri = config.productUri;
     this.endpoint = endpoint;
     this.session = null;
     this.step = null;
+    this.location = null;
     
     /**
      * Setzen der aktuellen Produktionsstufe
@@ -18,13 +18,21 @@ var client = function Client(endpoint) {
     this.setStep = function (currentStepName) {
         this.step = currentStepName;
     }
+    
+    /**
+     * Setzen der aktuellen Location
+     * @param {String} currentStepName 
+     */
+    this.setLocation = function (location) {
+        this.location = location;
+    }
 
     /**
      * Produkt muss warten
      * @param {function} callback 
      */
     this.wait = function (callback) {
-        callStatusMethod(this.session, this.step, "WAIT", callback);
+        callStatusMethod(this.session, this.step, "WAIT", this.location, callback);
     }
 
     /**
@@ -32,7 +40,7 @@ var client = function Client(endpoint) {
      * @param {function} callback 
      */
     this.produce = function (callback) {
-        callStatusMethod(this.session, this.step, "PRODUCE", callback);
+        callStatusMethod(this.session, this.step, "PRODUCE", this.location, callback);
     }
 
     /**
@@ -40,7 +48,7 @@ var client = function Client(endpoint) {
      * @param {function} callback 
      */
     this.finished = function (callback) {
-        callStatusMethod(this.session, this.step, "FINISHED", callback);
+        callStatusMethod(this.session, this.step, "FINISHED", this.location, callback);
     }
 
     /**
@@ -96,14 +104,16 @@ function CreateSession(opcClient, callback) {
         callback(sess, err);
     });
 }
-function callStatusMethod (session, step, status, callback) {
+function callStatusMethod (session, step, status, location, callback) {
     
     console.log("Call Method setStatus with ["+step+","+status+"]");
     
     var methodToCall = {
         objectId: "ns=1;s=Product", // nodeId des Ordners oder Objekts
         methodId: "ns=1;s=setStatus", // nodeId der Methode
-        inputArguments: [{dataType: opcua.DataType.String, value: step}, {dataType: opcua.DataType.String, value: status}]
+        inputArguments: [{dataType: opcua.DataType.String, value: step}, 
+                         {dataType: opcua.DataType.String, value: status}, 
+                         {dataType: opcua.DataType.String, value: location}]
     };
 
     session.call(methodToCall, function (err, results) {

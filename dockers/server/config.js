@@ -31,41 +31,52 @@ config.methods[0] = {
         }
     ],
     'method': function (args, status, callback, callbackProduced) {
-        var endpoint = args[0].value;
-        // client.setUrl(args[0].value);
-        var produceClient = new clientClass(endpoint);
-        produceClient.setStep(config.methods[0].name);
-        produceClient.createSession(function (err) {
-            console.log("connected with "+endpoint);
-            produceClient.produce(function (err) {
-                 console.log("producing...");
-                 status = 'PRODUCING';
-                 var result = true;
-                 if (err)
-                 {
-                     result = false;
-                     status = 'WAIT';
-                 }
-                else
-                {
-                    // After n seconds set product as finished
-                    setTimeout(function () {
-                        var finishedClient = new clientClass(endpoint);
-                        finishedClient.setStep(config.methods[0].name);
-                        finishedClient.createSession(function (sess, err) {
-                            finishedClient.finished(function () {
-                                console.log("aaaand finished");
-                                status = 'WAIT';
-                                finishedClient.stopSession();
-                                callbackProduced();
+        if (status == 'WAIT')
+        {
+            status = 'ATTEMPTING'; // Set Status 
+            
+            var endpoint = args[0].value;
+            // client.setUrl(args[0].value);
+            var produceClient = new clientClass(endpoint);
+            produceClient.setStep(config.methods[0].name);
+            produceClient.setLocation(config.productName);
+            produceClient.createSession(function (err) {
+                console.log("connected with "+endpoint);
+                produceClient.produce(function (err) {
+                    console.log("producing...");
+                    status = 'PRODUCING';
+                    var result = true;
+                    if (err)
+                    {
+                        result = false;
+                        status = 'WAIT';
+                    }
+                    else
+                    {
+                        // After n seconds set product as finished
+                        setTimeout(function () {
+                            var finishedClient = new clientClass(endpoint);
+                            finishedClient.setStep(config.methods[0].name);
+                            finishedClient.setLocation(config.productName);
+                            finishedClient.createSession(function (sess, err) {
+                                finishedClient.finished(function () {
+                                    console.log("aaaand finished");
+                                    status = 'WAIT';
+                                    finishedClient.stopSession();
+                                    callbackProduced();
+                                });
                             });
-                        });
-                    }, config.duration);
-                }
-                produceClient.stopSession();
-                callback(err, "Boolean", result, status);
-             });
-        });
+                        }, config.duration);
+                    }
+                    produceClient.stopSession();
+                    callback(err, "Boolean", result, status);
+                });
+            });
+        }
+        else
+        {
+            callback(null, "Boolean", false, status);
+        }
         //callback(null, "Boolean", false);
     }
 };
