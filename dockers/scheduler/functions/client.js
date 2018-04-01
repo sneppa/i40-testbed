@@ -1,84 +1,192 @@
 var opcua = require("node-opcua");
-var config = require("../config");
+var async = require("async");
 var options = { connectionStrategy: {maxRetry: 2, initialDelay: 100, maxDelay: 200}};
-var opcClient = new opcua.OPCUAClient();
 
-var endpointUrl;
-var session;
+// var endpointUrl;
+// var session;
 
-var client = {
-    getServerList: function (callback) {
-        ConnectToServer(config.discovery.url, function (opcClient, err) {
+var sessionsOpened = 0;
+var sessionsClosed = 0;
+
+var client = function Client(endpoint) {
+
+    this.endpoint = endpoint;
+    this.session = null;
+    this.opcClient = new opcua.OPCUAClient();
+    // constructor(endpoint) {
+    //     this.endpoint = endpoint;
+    //     this.session = "asd";
+    // }
+
+    this.getServerList = function(callback)  {
+
+        // console.log("Endpoint: asddas asd "+this.endpoint);
+        // console.log("Endpoint: asddas asd "+endpoint);
+        // console.log(this.opcClient);
+
+        ConnectToServer(this.opcClient, endpoint, function (err) {
+
             if (err) {
                 console.log('err: ' + err);
             } else {
-                opcClient.findServers(function (err, servers) {
+                // console.log(this.opcClient);
+                // console.log(opcClient);
+                this.opcClient.findServers(function (err, servers) {
 //                    console.log(servers);
-                    opcClient.disconnect(function (err) {});
+                        this.opcClient.disconnect(function (err) { 
+                        // console.log("Disconnected from Discover Server"); 
+                    }.bind(this));
                     callback(err, servers);
-                });
+                }.bind(this));
             }
-        });
-    },
-    createSession: function (endpointUrl, callback) {
-        ConnectToServer(endpointUrl, function (opcClient, err) {
+        }.bind(this));
+    }
+
+    this.createSession = function(callback) {
+        ConnectToServer(this.opcClient, this.endpoint, function (err) {
             if (err) {
                 console.log('err 1: ' + err);
                 callback(null, err);
             } else {
-                CreateSession(opcClient, function (sess, err) {
+                CreateSession(this.opcClient, function (sess, err) {
                     if (err) {
                         console.log('err 2: ' + err);
                     } else {
-                        callback(sess, err);
+                        this.session = sess;
+                        callback(err);
                     }
-                });
+                }.bind(this));
             }
-        });
-    },
-    getChildren: function (id, sess, callback) {
-        sess.browse(id, function (err, result) {
+        }.bind(this));
+    }
+
+    this.getChildren = function(id, callback) {
+        this.session.browse(id, function (err, result) {
             if (err === null && result.statusCode.name == "BadNodeIdUnknown")
             {
                 result = null;
                 err = "BadNodeIdUnknown";
             }
             callback(result, err);
-        });
-    },
-    getValue: function (id, sess, callback) {
+        }.bind(this));
+    }
+    
+    this.getValue = function(id, callback) {
         //var id = "ns=1;s=Teile"; // String ID
         // id = ns=1;i=1001; // Integer ID
-        sess.read({nodeId: id, attributeId: opcua.AttributeIds.Value}, 0, function (err, res) {
+        this.session.read({nodeId: id, attributeId: opcua.AttributeIds.Value}, 0, function (err, res) {
             callback(res, err);
+        }.bind(this));
+    }
+    
+    this.setStatus = function(step, status, callback) {
+    
+        console.log("Call Method setStatus with ["+step+","+status+"]");
+        
+        var methodToCall = {
+            objectId: "ns=1;s=Product", // nodeId des Ordners oder Objekts
+            methodId: "ns=1;s=setStatus", // nodeId der Methode
+            inputArguments: [{dataType: opcua.DataType.String, value: step}, {dataType: opcua.DataType.String, value: status}]
+        };
+    
+        this.session.call(methodToCall, function (err, results) {
+            // console.log("Called Method setSatus");
+            // console.log(err);
+            // console.log(results);
+            var callSuccess = results.outputArguments[0].value[0];
+            console.log("Returned: " + callSuccess);
+            
+            if (!callSuccess)
+                err = {msg:"Not Allowed"}; // Durch normale OPC UA Error ersetzen
+            
+            callback(err);
+        }.bind(this));
+    }
+
+    this.commitProductToServer = function(server, product, callback) {
+        this.createSession(function (err) {
+            console.log('Call Method '+server.method.name);
+            //console.log(server.method.origin.nodeId.toString());
+            var methodToCall = {
+                objectId: "ns=1;s=Service", // nodeId des Ordners oder Objekts
+                methodId: server.method.origin.nodeId.toString(), // nodeId der Methode
+                inputArguments: [{dataType: opcua.DataType.String, value: product.uri}]
+            };
+    
+            this.session.call(methodToCall, function (err, results) {
+                console.log('Called Method '+server.method.name);
+                console.log(err);
+                console.log("Returned: " + results);
+                this.stopSession();
+                callback();
+            }.bind(this));
+        }.bind(this));
+    }
+
+    /**
+     * Ruft die Produktionsstufen aus dem Addressraum ab (aufgerufen von getServers)
+     * 
+     * @param {NodeData} data 
+     * @param {callback} callbackFinal 
+     */
+    this.getSteps = function(data, callbackFinal)
+    {
+        var result = [];
+    
+        async.forEachOf(data, (value, key, callback) => {
+            //console.log(value);
+            var name = value.displayName.text;
+            //console.log("name: "+name);
+    
+            if (name.substr(0,5) == "step-")
+            {
+                this.getValue(value.nodeId, function (data, err) {
+                    result[name.substr(5)] = data.value.value;
+                    //console.log(name+":"+data.value.value);
+                    callback(err);
+                }.bind(this));
+    
+            }
+            else
+                callback();
+        }, err => {
+            if (err) console.error(err.message);
+            // configs is now a map of JSON data
+            callbackFinal(err, result);
         });
-    },
-    stopSession: function (sess) {
-        sess.close(function (err) {
-            opcClient.disconnect(function (err) {});
-        });
+    }
+
+    this.stopSession = function() {
+            console.log("Close Client Session ("+this.session.endpoint.endpointUrl+")");
+            sessionsClosed++;
+            this.session.close(function (err) {
+            this.opcClient.disconnect(function (err) {console.log("Disconnect".red);}.bind(this));
+        }.bind(this));
+    }
+
+    this.printSessionCounter = function () {
+        console.log("Sessions opened: "+sessionsOpened);
+        console.log("Sessions closed: "+sessionsClosed);
     }
 };
 
 
-function ConnectToServer(endpointUrl, callback) {
-    var opcClient = new opcua.OPCUAClient(options);
+function ConnectToServer(opcClient, endpointUrl, callback) {
     opcClient.connect(endpointUrl, function (err) {
         if (err) {
             console.log(" cannot connect to endpoint :", endpointUrl);
         } else {
-            console.log("Client connected to " + endpointUrl);
+            //console.log(("Client connected to " + endpointUrl).red);
         }
-        callback(opcClient, err);
+        callback(err);
     });
 }
 function CreateSession(opcClient, callback) {
     opcClient.createSession(function (err, sess) {
-        if (err)
+        if (!err)
         {
-
-        } else {
-            console.log("Established Client Session");
+            console.log("Established Client Session ("+sess.endpoint.endpointUrl+")");
+            sessionsOpened++;
         }
         callback(sess, err);
     });

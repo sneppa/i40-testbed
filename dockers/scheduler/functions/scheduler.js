@@ -1,9 +1,12 @@
 var async = require("async");
-var opcClient = require('./client');
+var ClientClass = require('./client');
+var client = new ClientClass();
 var opcua = require("node-opcua");
 
 var machines = [];
 var products = [];
+
+var counter = 0;
 
 var scheduler = {
     /**
@@ -28,46 +31,71 @@ var scheduler = {
      * Ruft alle Server vom Discovery Server ab und fügt sie zu Produkt oder Maschine hinzu
      */
     getServers: function (init, callbackAsync) {
-        opcClient.getServerList(function (err, servers) {
-        
+
+        var foundServers = [];
+
+        var discoveryClient = new ClientClass(config.discovery.url);
+        discoveryClient.getServerList(function (err, servers) {
+            counter++;
+            console.log("Counter: "+counter + " (Servers: "+servers.length+")");
+
             async.forEachOf(servers, function (server, index, callback) { 
                 var endpoint = server.discoveryUrls[0];
 
-                console.log(endpoint);
+                //console.log(endpoint);
         
-                if (endpoint != config.discovery.url && !scheduler.existsServer(endpoint))
+                if (scheduler.existsServer(endpoint)) // Server bereits in der Liste
                 {
-                    opcClient.createSession(endpoint, function (sess, err) {
+                    foundServers.push(endpoint);
+                    callback(err);
+                }
+                else if (endpoint != config.discovery.url) // Neuer Server und nicht Discovery
+                {
+                    //var aCLient = new client;
+                    var serverClient = new ClientClass(endpoint);
+                    serverClient.createSession(function (err) {
                         if (err)
                         {
-                            console.log("Can't conntect to "+endpoint);
+                            console.log("Can't conntect to "+serverClient.endpoint);
                             callback(err);
                         }
                         else
                         {
-                            opcClient.getChildren("ns=1;s=Service", sess, function (data, err) {
+                            serverClient.getChildren("ns=1;s=Service", function (data, err) {
                                 //console.log(data);
                                 //console.log(err);
                                 if (!err)
                                 {
-                                    console.log("An Schedular übergeben (Machine)");
-                                    scheduler.addMachine(server, sess, data, function () { callback(); });
+                                    //console.log("An Schedular übergeben (Machine)");
+                                    scheduler.addMachine(serverClient, server, data, function () { 
+                                        foundServers.push(endpoint);
+                                        callback(); 
+                                    });
                                 }
                                 else if (err == "BadNodeIdUnknown")
                                 {
-                                    console.log("In Produkt else");
-                                    opcClient.getChildren("ns=1;s=Product", sess, function (data, err) {
+                                    serverClient.getChildren("ns=1;s=Product", function (data, err) {
                                         if (!err)
                                         {
-                                            console.log("An Schedular übergeben (Product)");
-                                            scheduler.addProduct(server, sess, function () { callback(); console.log("prod added"); });
+                                            //console.log("An Schedular übergeben (Product)");
+                                            scheduler.addProduct(serverClient, server, function () { 
+                                                foundServers.push(endpoint);
+                                                callback(); 
+                                                // console.log("prod added"); 
+                                            });
                                         }
                                         else
+                                        {
+                                            serverClient.stopSession();
                                             callback(err);
+                                        }
                                     });
                                 }
                                 else
+                                {
+                                    serverClient.stopSession();
                                     callback(err);
+                                }
                             });
         
         
@@ -75,9 +103,32 @@ var scheduler = {
                     });
                 } 
                 else
-                    callback();
+                {
+                    callback(err);
+                }
         
             }, function(err) {
+
+                // console.log(foundServers);
+
+                var newMachines = [];
+                // Maschinen durchgehen, die noch verfügbar sind
+                machines.forEach(function (item, index, array) {
+                    // console.log(item.uri+ " (mach "+inArray(item.uri, foundServers)+" ) ");
+                    if (inArray(item.uri, foundServers))
+                        newMachines.push(item);
+                });
+                machines = newMachines;
+
+                var newProducts = [];
+                // Produkte durchgehen, die noch verfügbar sind
+                products.forEach(function (item, index, array) {
+                    // console.log(item.uri+ " (prod "+inArray(item.uri, foundServers)+" ) ");
+                    if (inArray(item.uri, foundServers))
+                        newProducts.push(item);
+                });
+                products = newProducts;
+
                 callbackAsync(err);
             });
         
@@ -89,37 +140,54 @@ var scheduler = {
     updateProducts: function (callbackAsync) {
         //console.log(" - - - - - - - - ");
         //console.log(products);
+        var newProducts = [];
         
         async.forEachOf(products, function (product, index, callback) { 
             //console.log(product);
 
-            if (product.status == "PRODUCED") // Produkt fertiggestellt, keine Änderungen mehr möglich
+            if (product.new) // Produkt ist neu dazu gekommen, muss nicht gecrawled werden
+            {
+                product.new = false;
+                newProducts.push(product);
+                callback(); 
+            }
+            else if (product.status == "PRODUCED" && !config.ignoreProduced) // Produkt fertiggestellt, keine Änderungen mehr möglich
+            {
+                newProducts.push(product);
                 callback();
+            }
             else
             {
-                opcClient.createSession(product.uri, function (sess, err) {
+                var productClient = new ClientClass(product.uri);
+                productClient.createSession(function (err) {
                     if (!err)
                     {
-                        scheduler.addProduct(product.origin, sess, function () {
-                            products.splice(index,1); // Alter Eintrag löschen
+                        scheduler.addProduct(productClient, product.origin, function (product) {
+                            product.new = false;
+                            newProducts.push(product);
+                            //products.splice(index,1); // Alter Eintrag löschen
                             callback(); 
                         });
                     }
                     else
+                    {
+                        newProducts.push(product);
                         callback(err);
+                    }
                 });
             }
         },
         function (err) {
+            products = newProducts;
             callbackAsync(err);
         });
     },
     /**
      * Fügt ein neues Produkt hinzu (von getServers aufgerufen)
      */
-    addProduct: function (server, session, finalCallback) {
+    addProduct: function (client, server, finalCallback) {
 
-        var product = {uri: server.discoveryUrls[0], origin: server};
+        var product = {uri: server.discoveryUrls[0], origin: server, new: true};
 
         console.log("Add Product");
 
@@ -127,29 +195,29 @@ var scheduler = {
 
         async.series([
             function (callback) {
-                opcClient.getValue("ns=1;s=location", session, function (data, err) {
+                client.getValue("ns=1;s=location", function (data, err) {
                     product.location = data.value.value;
                     callback(err);
                 });
             },
             function (callback) {
-                opcClient.getValue("ns=1;s=status", session, function (data, err) {
+                client.getValue("ns=1;s=status", function (data, err) {
                     product.status = data.value.value;
                     callback(err);
                 });
             },
             function (callback) {
-                opcClient.getValue("ns=1;s=currentStep", session, function (data, err) {
+                client.getValue("ns=1;s=currentStep", function (data, err) {
                     //console.log(data);
                     product.currentStep = data.value.value;
                     callback(err);
                 });
             },
             function (callback) {
-                opcClient.getChildren("ns=1;s=Step", session, function (data, err) {
+                client.getChildren("ns=1;s=Step", function (data, err) {
                     //console.log(data);
                     //steps = data;
-                    getSteps(session, data.references, function (err, data) {
+                    client.getSteps(data.references, function (err, data) {
                         product.steps = data;
                         callback(err);
                     });
@@ -161,17 +229,16 @@ var scheduler = {
                 console.log(" failure ", err);
             } else {
                 console.log("done!");
-
                 products.push(product);
             }
-            opcClient.stopSession(session);
-            finalCallback(err);
+            client.stopSession();
+            finalCallback(product, err);
         });
     },
     /**
      * Fügt eine neue Maschine hinzu (von getServers aufgerufen)
      */
-    addMachine: function (server, session, nodeData, finalCallback) {
+    addMachine: function (client, server, nodeData, finalCallback) {
 
         var machine = {uri: server.discoveryUrls[0], origin: server, methods: []};
 
@@ -188,7 +255,7 @@ var scheduler = {
 
         machines.push(machine);
 
-        opcClient.stopSession(session);
+        client.stopSession();
         finalCallback();
     },
     /**
@@ -199,15 +266,32 @@ var scheduler = {
         //console.log(products);
         
         async.forEachOf(products, function (product, index, callback) { 
-            console.log(product);
+            //console.log(product);
 
             if (product.status == "FINISHED") // Nächsten Produktionsschritt setzen
             {
                 console.log("Nächste Station setzen");
+                var newStep = product.currentStep + 1;
+                console.log(newStep+" < "+product.steps.length);
+                var status = 'WAIT';    
+
+                if (newStep == product.steps.length) // Keine weiterer Produktionsschritt -> PRODUCED
+                {
+                    status = 'PRODUCED';
+                    newStep -= 1;
+                }
+                
+                var productClient = new ClientClass(product.uri);
+                productClient.createSession(function (err) {
+                    productClient.setStatus(product.steps[newStep], status, function (err, result) {
+                        console.log("Set "+product.uri+" to "+status+" ("+result+")");
+                        productClient.stopSession();
+                        callback();
+                    });
+                });
 
             }
-
-            if (product.status == "WAIT") // Station suchen
+            else if (product.status == "WAIT") // Station suchen
             {
                 console.log("An nächste Station übergeben");
 
@@ -258,11 +342,16 @@ var scheduler = {
                     if (status == "WAIT")
                     {
                         //console.log("Connect with please "+machine.uri);
-                        scheduler.commitProductToServer(machine, product);
-                        //console.log("jo");
-                        found = true;
+                        scheduler.commitProductToServer(machine, product, function () {
+                            found = true;
+                            callback();
+                        });
                     }
-                    callback();
+                    else
+                    {
+                        console.log("Machine not available ("+machine.uri+")");
+                        callback();
+                    }
                 })
             }
             else
@@ -278,39 +367,48 @@ var scheduler = {
      * Abfragen des Status eines Servers
      */
     getMachineStatus: function(server, callback) {
-        opcClient.createSession(server.uri, function (sess, err) {
-            opcClient.getValue("ns=1;s=Status", sess, function (data, err) {
+        var machineClient = new ClientClass(server.uri);
+        machineClient.createSession(function (err) {
+            machineClient.getValue("ns=1;s=Status", function (data, err) {
                 callback(data.value.value);
-                opcClient.stopSession(sess);
+                machineClient.stopSession();
             });
         });
     },
     /**
      * Abfragen des Status eines Servers
      */
-    commitProductToServer: function(server, product) {
-        opcClient.createSession(server.uri, function (sess, err) {
-            console.log('Call Method '+server.method.name);
-            console.log(server.method.origin.nodeId.toString());
-            var methodToCall = {
-                objectId: "ns=1;s=Service", // nodeId des Ordners oder Objekts
-                methodId: server.method.origin.nodeId.toString(), // nodeId der Methode
-                inputArguments: [{dataType: opcua.DataType.String, value: product.uri}]
-            };
-    
-            sess.call(methodToCall, function (err, results) {
-                console.log(err);
-                console.log("Returned: " + results);
-                opcClient.stopSession(sess);
-            });
+    commitProductToServer: function(server, product, callback) {
+        var productClient = new ClientClass(server.uri);
+        productClient.commitProductToServer(server, product, function () {
+            callback();
         });
     },
     /**
      * Gibt die aktuell bekannten Server aus
      */
     printServers: function () {
-        console.log(machines);
-        console.log(products);
+        console.log("- - - - - - - - - - - - - - - - - -");
+        console.log("Known machines:");
+        machines.forEach(function (machine) {
+            var methods = "";
+            machine.methods.forEach(function (method, index) { 
+                if (index != 0)
+                    methods += ", ";
+                methods += method.name;
+            })
+
+            console.log("   - "+machine.uri+" ("+methods+")");
+        })
+        console.log("");
+        console.log("Known products:");
+        products.forEach(function (product) {
+            console.log("   - "+product.uri+" ("+product.status+")");
+        })
+        console.log("");
+        var client = new ClientClass();
+        client.printSessionCounter();
+        console.log("- - - - - - - - - - - - - - - - - -");
     }
 };
 
@@ -323,40 +421,6 @@ function inArray(needle, haystack) {
         if(haystack[i] == needle) return true;
     }
     return false;
-}
-
-/**
- * Ruft die Produktionsstufen aus dem Addressraum ab (aufgerufen von getServers)
- * 
- * @param {OpcUaSession} sess 
- * @param {NodeData} data 
- * @param {callback} callbackFinal 
- */
-function getSteps(sess, data, callbackFinal)
-{
-    var result = [];
-
-    async.forEachOf(data, (value, key, callback) => {
-        //console.log(value);
-        var name = value.displayName.text;
-        //console.log("name: "+name);
-
-        if (name.substr(0,5) == "step-")
-        {
-            opcClient.getValue(value.nodeId, sess, function (data, err) {
-                result[name.substr(5)] = data.value.value;
-                //console.log(name+":"+data.value.value);
-                callback(err);
-            });
-
-        }
-        else
-            callback();
-    }, err => {
-        if (err) console.error(err.message);
-        // configs is now a map of JSON data
-        callbackFinal(err, result);
-    });
 }
 
 module.exports = scheduler;

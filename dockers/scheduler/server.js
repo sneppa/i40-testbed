@@ -27,15 +27,14 @@ scheduler.getServers(true, function (err) {
 function setCrawlInterval() { 
     
     timer = setTimeout(function () {
+        scheduler.getServers(false, function () { // Neue Server hinzufügen
 
-        scheduler.updateProducts(function() { // Produkte aktualisieren
-
-            scheduler.getServers(false, function () { // Neue Server hinzufügen
-
+            scheduler.updateProducts(function() { // Produkte aktualisieren
+        
                 scheduler.scheduleProducts(function() { // Planen der Produkte
                     console.log("Crawled servers after "+config.interval+"ms interval");
-                    //setCrawlInterval();
-                    //scheduler.printServers();
+                    setCrawlInterval();
+                    scheduler.printServers();
                 })
             });
 
