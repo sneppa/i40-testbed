@@ -3,66 +3,79 @@ var options = {
     securityMode: "NONE",
     securityPolicy: "None"
 };
-var opcClient = new opcua.OPCUAClient(options);
 
-var client = {
-    // setUrl: function (urlToProduct) {
-    //     endpointUrl = urlToProduct;
-    // },
-    setStep: function (currentStepName) {
-        step = currentStepName;
-    },
-//    setStatus: function (currentStatus) {
-//        status = currentStatus;
-//    },
+var client = function Client(endpoint) {
+
+    this.opcClient = new opcua.OPCUAClient(options);
+    this.endpoint = endpoint;
+    this.session = null;
+    this.step = null;
+    
+    /**
+     * Setzen der aktuellen Produktionsstufe
+     * @param {String} currentStepName 
+     */
+    this.setStep = function (currentStepName) {
+        this.step = currentStepName;
+    }
+
     /**
      * Produkt muss warten
+     * @param {function} callback 
      */
-    wait: function (session, callback) {
-        callStatusMethod(session, step, "WAIT", callback);
-    },
+    this.wait = function (callback) {
+        callStatusMethod(this.session, this.step, "WAIT", callback);
+    }
+
     /**
      * Produkt wird verarbeitet
+     * @param {function} callback 
      */
-    produce: function (session, callback) {
-        callStatusMethod(session, step, "PRODUCE", callback);
-    },
+    this.produce = function (callback) {
+        callStatusMethod(this.session, this.step, "PRODUCE", callback);
+    }
+
     /**
      * Produkt wurde fertig verarbeitet
+     * @param {function} callback 
      */
-    finished: function (session, callback) {
-        callStatusMethod(session, step, "FINISHED", callback);
-    },
+    this.finished = function (callback) {
+        callStatusMethod(this.session, this.step, "FINISHED", callback);
+    }
+
     /**
-     * Zum nächsten Produktionsschritt senden
+     * Session erstellen
+     * @param {function} callback 
      */
-    next: function () {
-//        callStatusMethod(step, "FINISHED", callback);
-    },
-    createSession: function (endpoint, callback) {
-        ConnectToServer(endpoint, function (err) {
+    this.createSession = function (callback) {
+        ConnectToServer(this.opcClient, this.endpoint, function (err) {
             if (err) {
                 console.log('err: ' + err);
             } else {
-                CreateSession(function (session, err) {
+                CreateSession(this.opcClient, function (session, err) {
                     if (err) {
                         console.log('err: ' + err);
                     } else {
-                        callback(session, err);
+                        this.session = session;
+                        callback(err);
                     }
-                });
+                }.bind(this));
             }
-        });
-    },
-    stopSession: function (session) {
-        session.close(function (err) {
-            opcClient.disconnect(function (err) {});
-        });
+        }.bind(this));
+    }
+
+    /**
+     * Beenden der Sitzung
+     */
+    this.stopSession = function () {
+        this.session.close(function (err) {
+            this.opcClient.disconnect(function (err) { }.bind(this));
+        }.bind(this));
     }
 };
 
 
-function ConnectToServer(endpointUrl, callback) {
+function ConnectToServer(opcClient, endpointUrl, callback) {
     opcClient.connect(endpointUrl, function (err) {
         if (err) {
             console.log(" cannot connect to endpoint :", endpointUrl);
@@ -72,14 +85,13 @@ function ConnectToServer(endpointUrl, callback) {
         callback(err);
     });
 }
-function CreateSession(callback) {
+function CreateSession(opcClient, callback) {
     opcClient.createSession(function (err, sess) {
         if (err)
         {
 
         } else {
             console.log("Established Client Session");
-            //session = sess;
         }
         callback(sess, err);
     });
@@ -96,13 +108,12 @@ function callStatusMethod (session, step, status, callback) {
 
     session.call(methodToCall, function (err, results) {
         console.log("Called Method setSatus");
-        console.log(err);
-        console.log(results);
-        // var callSuccess = results.outputArguments[0].value[0];
-        // console.log("Returned: " + callSuccess);
         
-        // if (!callSuccess)
-        //     err = {msg:"Not Allowed"}; // Durch normale OPC UA Error ersetzen
+        var callSuccess = false;
+        if (!err)
+            callSuccess = results.outputArguments[0].value[0];
+        if (!callSuccess)
+            err = {msg:"Not Allowed"};
         
         callback(err);
     });

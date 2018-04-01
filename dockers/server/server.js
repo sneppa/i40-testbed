@@ -63,7 +63,8 @@ function post_initialize() {
             outputArguments: outputArguments
         }).bindMethod(function (inputArguments, context, callback) {
 
-            method.method(inputArguments, status, function (err, dataType, output) {
+            method.method(inputArguments, status, function (err, dataType, output, statusRet) {
+                status = statusRet; // Status: WAIT bei Fehler | PRODUCING bei OK
             
                 console.log("Output generated: " + output);
 //
@@ -79,8 +80,10 @@ function post_initialize() {
                 console.log(callMethodResult);
                 
                 callback(null, callMethodResult);
+            }, function () {
+                status = 'WAIT';
             });
-        });
+        }.bind(status));
     });
 }
 

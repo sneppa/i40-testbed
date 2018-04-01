@@ -1,6 +1,6 @@
 config = {};
 
-var client = require('./functions/client');
+var clientClass = require('./functions/client');
 
 config.discovery = {};
 //config.discovery.url = 'opc.tcp://localhost:4840'; // URL zum Discovery Server bei NodeJS Ausführung
@@ -30,13 +30,14 @@ config.methods[0] = {
             'dataType': 'Boolean'
         }
     ],
-    'method': function (args, status, callback) {
+    'method': function (args, status, callback, callbackProduced) {
         var endpoint = args[0].value;
         // client.setUrl(args[0].value);
-        client.setStep(config.methods[0].name);
-        client.createSession(endpoint, function (session, err) {
+        var produceClient = new clientClass(endpoint);
+        produceClient.setStep(config.methods[0].name);
+        produceClient.createSession(function (err) {
             console.log("connected with "+endpoint);
-            client.produce(session, function (err) {
+            produceClient.produce(function (err) {
                  console.log("producing...");
                  status = 'PRODUCING';
                  var result = true;
@@ -49,17 +50,20 @@ config.methods[0] = {
                 {
                     // After n seconds set product as finished
                     setTimeout(function () {
-                        client.createSession(endpoint, function (sess, err) {
-                            client.finished(sess, function () {
+                        var finishedClient = new clientClass(endpoint);
+                        finishedClient.setStep(config.methods[0].name);
+                        finishedClient.createSession(function (sess, err) {
+                            finishedClient.finished(function () {
                                 console.log("aaaand finished");
                                 status = 'WAIT';
-                                client.stopSession(sess);
+                                finishedClient.stopSession();
+                                callbackProduced();
                             });
                         });
                     }, config.duration);
                 }
-                client.stopSession(session);
-                callback(err, "Boolean", result);
+                produceClient.stopSession();
+                callback(err, "Boolean", result, status);
              });
         });
         //callback(null, "Boolean", false);
