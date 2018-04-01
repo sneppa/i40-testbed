@@ -383,7 +383,7 @@ function addMethodsToAdressspace(addressSpace, folder, product)
             var step = inputArguments[0].value;
             var stepIndex = null;
             var status = inputArguments[1].value.toUpperCase();
-            var allowedStatus = ["WAIT", "PRODUCE", "FINISHED", "FAILURE"];
+            var allowedStatus = ["WAIT", "PRODUCE", "FINISHED", "FAILURE", "PRODUCED"];
             
             var returnValue = [false];
             
@@ -404,7 +404,18 @@ function addMethodsToAdressspace(addressSpace, folder, product)
             // Änderungen nur wenn Produkt und Status und Produktionsstufe i.O.
             if (product.status != "FAILURE" && inArray(status, allowedStatus) && stepIndex != null) 
             {
-                if (stepIndex == product.currentStep)
+                if (status == "PRODUCED")
+                {
+                    if (product.step.length == product.currentStep+1)
+                    {
+                        product.status = status;
+                        product.location = "Lager";
+
+                        mUtil.updateProduct(product, function () {});
+                        returnValue = [true];
+                    }
+                }
+                else if (stepIndex == product.currentStep)
                 {
                     product.status = status;
                     product.currentStep = stepIndex;
