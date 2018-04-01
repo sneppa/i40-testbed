@@ -79,14 +79,16 @@ var client = function Client(endpoint) {
         }.bind(this));
     }
     
-    this.setStatus = function(step, status, callback) {
+    this.setStatus = function(step, status, location, callback) {
     
         console.log("Call Method setStatus with ["+step+","+status+"]");
         
         var methodToCall = {
             objectId: "ns=1;s=Product", // nodeId des Ordners oder Objekts
             methodId: "ns=1;s=setStatus", // nodeId der Methode
-            inputArguments: [{dataType: opcua.DataType.String, value: step}, {dataType: opcua.DataType.String, value: status}]
+            inputArguments: [{dataType: opcua.DataType.String, value: step}, 
+                             {dataType: opcua.DataType.String, value: status}, 
+                             {dataType: opcua.DataType.String, value: location}]
         };
     
         this.session.call(methodToCall, function (err, results) {
@@ -114,9 +116,7 @@ var client = function Client(endpoint) {
             };
     
             this.session.call(methodToCall, function (err, results) {
-                console.log('Called Method '+server.method.name);
-                console.log(err);
-                console.log("Returned: " + results);
+                console.log('Called Method '+server.method.name+' (Result: '+(!err ? 'good' : 'bad')+')');
                 this.stopSession();
                 callback();
             }.bind(this));

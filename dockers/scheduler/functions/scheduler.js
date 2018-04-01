@@ -5,6 +5,7 @@ var opcua = require("node-opcua");
 
 var machines = [];
 var products = [];
+var usedMachines = [];
 
 var counter = 0;
 
@@ -264,9 +265,12 @@ var scheduler = {
     scheduleProducts: function (callbackAsync) {
         //console.log(" - - - - - - - - ");
         //console.log(products);
+
+        var searching = 0;
+        usedMachines = [];
         
-        async.forEachOf(products, function (product, index, callback) { 
-            //console.log(product);
+        async.forEachOf(products, function (product, index, callback) {
+            console.log('Schedule: '+product.uri);
 
             if (product.status == "FINISHED") // Nächsten Produktionsschritt setzen
             {
@@ -283,7 +287,7 @@ var scheduler = {
                 
                 var productClient = new ClientClass(product.uri);
                 productClient.createSession(function (err) {
-                    productClient.setStatus(product.steps[newStep], status, function (err, result) {
+                    productClient.setStatus(product.steps[newStep], status, 'Lager', function (err, result) {
                         console.log("Set "+product.uri+" to "+status+" ("+result+")");
                         productClient.stopSession();
                         callback();
@@ -293,13 +297,15 @@ var scheduler = {
             }
             else if (product.status == "WAIT") // Station suchen
             {
-                console.log("An nächste Station übergeben");
+                searching++;
+                console.log("An nächste Station übergeben ("+searching+")");
 
                 var method =  product.steps[product.currentStep];
 
                 var servers = scheduler.findServersWithMethod(method);
                 scheduler.forwardToServer(servers, product, function (found) {
-                    callback();
+                    console.log("Fertig mit "+searching);
+                        callback();
                 });
             }
             else
@@ -335,30 +341,31 @@ var scheduler = {
 
         var found = false;
 
-        async.forEachOf(servers, function (machine, index, callback) {
+        async.forEachOf(servers, function (machine, index, clbk) {
             if (!found)
             {
                 scheduler.getMachineStatus(machine, function (status) {
-                    if (status == "WAIT")
+                    if (status == "WAIT" && !inArray(machine.uri,usedMachines))
                     {
+                        usedMachines.push(machine.uri);
                         //console.log("Connect with please "+machine.uri);
                         scheduler.commitProductToServer(machine, product, function () {
                             found = true;
-                            callback();
+                            clbk();
                         });
                     }
                     else
                     {
                         console.log("Machine not available ("+machine.uri+")");
-                        callback();
+                        clbk();
                     }
                 })
             }
             else
-                callback();
+            clbk();
         },
         function () {
-            console.log("found: "+found);
+            console.log("found: "+found+" for "+product.uri);
             callbackAsync(found);
         });
 
