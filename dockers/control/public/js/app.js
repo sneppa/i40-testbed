@@ -352,6 +352,7 @@ app.controller('ProductOverview', function ($scope, $http, $timeout, $route) {
 
         loadRepoUrl($http, $scope, function ($http, $scope) {
             product.status = "WAIT";
+            //product.currentStep = 1;
             
             $http.post(repositoryUrl + '/product/' + product._id, product).then(
             function (res) {
