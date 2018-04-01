@@ -269,7 +269,7 @@ var scheduler = {
         var searching = 0;
         usedMachines = [];
         
-        async.forEachOf(products, function (product, index, callback) {
+        async.eachOfSeries(products, function (product, index, callback) {
             console.log('Schedule: '+product.uri);
 
             if (product.status == "FINISHED") // Nächsten Produktionsschritt setzen
@@ -341,28 +341,27 @@ var scheduler = {
 
         var found = false;
 
-        async.forEachOf(servers, function (machine, index, clbk) {
-            if (!found)
+        async.eachOfSeries(servers, function (machine, index, callback) {
+            if (!found && !inArray(machine.uri,usedMachines))
             {
                 scheduler.getMachineStatus(machine, function (status) {
-                    if (status == "WAIT" && !inArray(machine.uri,usedMachines))
+                    if (status == "WAIT")
                     {
                         usedMachines.push(machine.uri);
                         //console.log("Connect with please "+machine.uri);
                         scheduler.commitProductToServer(machine, product, function () {
                             found = true;
-                            clbk();
+                            callback();
                         });
                     }
                     else
                     {
                         console.log("Machine not available ("+machine.uri+")");
-                        clbk();
                     }
                 })
             }
             else
-            clbk();
+                callback();
         },
         function () {
             console.log("found: "+found+" for "+product.uri);

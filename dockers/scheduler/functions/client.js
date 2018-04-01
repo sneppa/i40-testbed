@@ -160,7 +160,7 @@ var client = function Client(endpoint) {
             console.log("Close Client Session ("+this.session.endpoint.endpointUrl+")");
             sessionsClosed++;
             this.session.close(function (err) {
-            this.opcClient.disconnect(function (err) {console.log("Disconnect".red);}.bind(this));
+            this.opcClient.disconnect(function (err) { }.bind(this));
         }.bind(this));
     }
 

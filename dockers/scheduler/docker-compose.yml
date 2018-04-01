@@ -2,7 +2,7 @@ version: "2"
 services:
   scheduler:
     container_name: scheduler
-#    restart: always
+    restart: always
     build: ./
 #    ports:
 #      - "4840:4840"
@@ -12,6 +12,7 @@ services:
     external_links:
       - discoveryserver
       - repository
+    tty: true
 networks:
     i40network:
         external:
