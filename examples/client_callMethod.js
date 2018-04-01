@@ -32,7 +32,9 @@ async.series([
         var methodToCall = {
             objectId: "ns=1;s=Product", // nodeId des Ordners oder Objekts
             methodId: "ns=1;s=setStatus", // nodeId der Methode
-            inputArguments: [{dataType: opcua.DataType.String, value: "Zuschneiden"}, {dataType: opcua.DataType.String, value: "WAIT"}]
+            inputArguments: [{dataType: opcua.DataType.String, value: "Zuschneiden"},       // Methode
+                             {dataType: opcua.DataType.String, value: "WAIT"},              // Status
+                             {dataType: opcua.DataType.String, value: "Zuschneider 3000"}]  // Location
         };
 
         session.call(methodToCall, function (err, results) {
