@@ -370,6 +370,10 @@ function addMethodsToAdressspace(addressSpace, folder, product)
                     name: "status",
                     description: {text: "Mögliche Status: WAIT, PRODUCE, FINISHED, FAILURE"},
                     dataType: opcua.DataType.String
+                }, {
+                    name: "location",
+                    description: {text: "Platz"},
+                    dataType: opcua.DataType.String
                 }
             ],
             outputArguments: [{
@@ -383,9 +387,12 @@ function addMethodsToAdressspace(addressSpace, folder, product)
             var step = inputArguments[0].value;
             var stepIndex = null;
             var status = inputArguments[1].value.toUpperCase();
+            var location = inputArguments[2].value;
             var allowedStatus = ["WAIT", "PRODUCE", "FINISHED", "FAILURE", "PRODUCED"];
             
             var returnValue = [false];
+
+            console.log(context.session.clientDescription); // );
             
 //            console.log(inputArguments);
             var idproduct = context.server.serverInfo.productUri;
@@ -421,7 +428,9 @@ function addMethodsToAdressspace(addressSpace, folder, product)
                     product.currentStep = stepIndex;
                     
                     if (status == "PRODUCE")
-                        product.location = step;
+                    {
+                        product.location = location;
+                    }
                     else if (status == "FINISHED")
                         product.location = "Lager";
                     
