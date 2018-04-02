@@ -23,6 +23,8 @@ The testbed can be used with nodejs, docker or kubernetes
 
 ### NodeJS
 
+Vor dem Start, alle Konfigurationsdateien auf NodeJs einstellen
+
 1. Start MongoDB
 
 ``$ mongod``
