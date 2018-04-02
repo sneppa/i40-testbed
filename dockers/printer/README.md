@@ -16,7 +16,7 @@ PDF wird mit verlinktem Drucker gedruckt
 
 ## Umsetzung (@TODO)
 
-Postscript zum Drucken
+Postscript zum Drucken (Hello World muss ersetzt werden und ggf. mit Datum/Zeit versehen werden)
 
 ```
 %!PS
