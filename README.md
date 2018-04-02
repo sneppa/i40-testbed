@@ -46,7 +46,7 @@ Vor dem Start, alle Konfigurationsdateien auf NodeJs einstellen
 
 [How to start server](https://github.com/sneppa/i40-testbed/tree/master/dockers/server)
 
-### Docker
+### Docker (recommended)
 
 Vor dem ersten Start:
 
