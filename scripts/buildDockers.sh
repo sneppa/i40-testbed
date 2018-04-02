@@ -9,4 +9,6 @@ sudo docker-compose --file ./dockers/repository/docker-compose.yml build # Build
 sudo docker-compose --file ./dockers/control/docker-compose.yml build # Build Controlpanel
 sudo docker-compose --file ./dockers/scheduler/docker-compose.yml build # Build Scheduler
 
+docker build --file dockers/wireshark/Dockerfile -t i40/wireshark ./dockers/wireshark/ # Build Wireshark Image 
+
 docker build --file dockers/server/Dockerfile -t i40/server ./dockers/server/ # Build Server Image 
