@@ -9,8 +9,8 @@ Concept and prototype described in https://github.com/sneppa/thesis-template
 - [Repository](https://github.com/sneppa/i40-testbed/tree/master/dockers/repository)
 - [Configurable Active I4.0 Component](https://github.com/sneppa/i40-testbed/tree/master/dockers/server)
 - [WireShark](https://github.com/sneppa/i40-testbed/tree/master/dockers/wireshark)
-- Configurable Active I4.0 Component Forwarder
-- PKI & Identity Provider
+<!--- - Configurable Active I4.0 Component Forwarder
+- PKI & Identity Provider --->
 
 ## Implemented with:
 - [NodeJS](https://github.com/nodejs)
