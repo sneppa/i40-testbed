@@ -8,7 +8,14 @@ config = args.setConfigs(config);
 
 var server = new opcua.OPCUAServer({
     port: config.port, // the port of the listening socket of the server
-    buildInfo: { productName: config.productName }
+    buildInfo: { productName: config.productName },
+    serverInfo: {
+        applicationUri: config.applicationUri,
+        productUri: config.productUri,
+        applicationName: {
+            text: config.productName
+        }
+    }
 });
 server.serverInfo.applicationUri = config.applicationUri;
 server.serverInfo.productUri = config.productUri; 

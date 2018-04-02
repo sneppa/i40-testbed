@@ -153,6 +153,13 @@ function addOpcUaProductServer(product)
             productName: product.name,
             buildNumber: "1",
             buildDate: product.buildDate > 0 ? Date(product.date) : Date(),
+        },
+        serverInfo: {
+            applicationUri: config.applicationUri,
+            productUri: config.productUri,
+            applicationName: {
+                text: config.productName
+            }
         }
     });
 
