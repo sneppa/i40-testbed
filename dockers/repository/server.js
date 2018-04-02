@@ -155,17 +155,14 @@ function addOpcUaProductServer(product)
             buildDate: product.buildDate > 0 ? Date(product.date) : Date(),
         },
         serverInfo: {
-            applicationUri: config.applicationUri,
-            productUri: config.productUri,
+            applicationUri: "urn:PRODUCT_" + product._id,
+            productUri: "PRODUCT_" + product._id,
             applicationName: {
-                text: config.productName
+                text: product.name, 
+                locale: "de"
             }
         }
     });
-
-    server.serverInfo.applicationUri = "urn:PRODUCT_" + product._id;
-    server.serverInfo.productUri = "PRODUCT_" + product._id;
-    server.serverInfo.applicationName = {text: product.name, locale: "de"};
 
     logger("Add Product Server: " + product.name + ":" + portcounter);
 
