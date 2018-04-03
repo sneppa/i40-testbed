@@ -13,6 +13,8 @@ config.applicationUri = 'urn:RealPrinter'; // Wird durch Command Line Parameter 
 config.productUri = 'RealPrinter'; // Wird durch Command Line Parameter gesetzt
 config.productName = 'Realer Drucker'; // Wird durch Command Line Parameter gesetzt
 
+config.printingTime = 13000; // Dauer des Ausdrucks
+
 // config.port = 4334; // Port des OPC UA Serverss // wird über Arguments übergeben
 
 config.methods = [];
@@ -67,45 +69,35 @@ config.methods[0] = {
                             if (err)
                                 console.log(stderr);
                             else {
-                                fs.readFile("print.ps", 'utf8', function (err, data) {
-                                    console.log("- - - - - - - - - - - - - -");
-                                    console.log(err);
-                                    console.log("Data:");
-                                    console.log(data);
-
-                                    if (!err)
+                                command = "lpr print.ps";
+                                exec(command, function (err, stdout, stderr) {
+                                    if (err)
                                     {
-                                        command = "lp print.ps";
-                                        exec(command, function (err, stdout, stderr) {
-                                            if (err)
-                                            {
-                                                console.log(err);
-                                                console.log(stderr);
-                                            }
-                                            else{
-                                                console.log("printed");
-                                                console.log(stdout);
-                                            }
-                                        });
+                                        console.log(err);
+                                        console.log(stderr);
                                     }
-                                })
+                                    else{
+                                        console.log("printing");
+                                        console.log(stdout);
+
+                                        // After n seconds set product as finished
+                                        setTimeout(function () {
+                                            var finishedClient = new clientClass(endpoint);
+                                            finishedClient.setStep(config.methods[0].name);
+                                            finishedClient.setLocation(config.productName);
+                                            finishedClient.createSession(function (sess, err) {
+                                                finishedClient.finished(function () {
+                                                    console.log(config.methods[0].name+" fertig");
+                                                    status = 'WAIT';
+                                                    finishedClient.stopSession();
+                                                    callbackProduced();
+                                                });
+                                            });
+                                        }, config.printingTime);
+                                    }
+                                });
                             }
                         });
-
-                        // After n seconds set product as finished
-                        setTimeout(function () {
-                            var finishedClient = new clientClass(endpoint);
-                            finishedClient.setStep(config.methods[0].name);
-                            finishedClient.setLocation(config.productName);
-                            finishedClient.createSession(function (sess, err) {
-                                finishedClient.finished(function () {
-                                    console.log(config.methods[0].name+" fertig");
-                                    status = 'WAIT';
-                                    finishedClient.stopSession();
-                                    callbackProduced();
-                                });
-                            });
-                        }, 1000);
                     }
                     produceClient.stopSession();
                     callback(err, "Boolean", result, status);

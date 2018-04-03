@@ -2,45 +2,15 @@
 
 Der Printer Docker wird für den Integrationstest des Testbeds gentutzt. Er druckt mittels PostScript den Namen des übergebenen Produkts aus.
 
-## Idee
+## Voraussetzungen
 
-Hostmaschine Drucker freigeben
+- CUPS Server auf dem Hostsystem
+- Standarddrucker ist eingerichtet
 
-Docker erstellen mit OPC UA Server
+## OPC UA Server
 
-Methode Drucken mit Produkt URI Parameter
+Der Server stellt, wie jeder Server im Testbed, im Service Objekt eine Methode und eine Variable bereit. Die Variable Status zeigt den Status des Servers an (WAIT, ATTEMPTING, PRODUCING). Die Methode zum Drucken nennt sich Drucken und hat die URI des Produkts als Parameter.
 
-Methode erstellt PostScript und erstellt daraus PDF.
+## Umsetzung
 
-PDF wird mit verlinktem Drucker gedruckt
-
-## Umsetzung (@TODO)
-
-Postscript zum Drucken (Hello World muss ersetzt werden und ggf. mit Datum/Zeit versehen werden)
-
-```
-%!PS
-/Times-Bold findfont 36 scalefont setfont
-72 684 moveto (Hello World!) show
-showpage
-```
-
-PDF Converter (nicht unbedingt nötig)
-
-```
-$ ps2pdf book.ps
-```
-
-Drucken des PDFs
-
-```
-$ lp book.pdf
-```
-
-Docker Freigabe Drucker
-
-``$ sudo docker run -t -i --device=/dev/ttyUSB0 ubuntu bash``
-
-oder 
-
-``$ sudo docker run -t -i --privileged -v /dev/bus/usb:/dev/bus/usb ubuntu bash``
+CUPS Socket wurden per Volumes dem Docker freigegeben. Auf dem Docker wurde der CUPS Client installiert. Eine PostScript Datei wird beim Aufrufen der Methode mit lpr gedruckt.

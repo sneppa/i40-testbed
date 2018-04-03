@@ -3,7 +3,7 @@ services:
   realprinter:
     container_name: realprinter
     hostname: realprinter
-    privileged: true
+#    privileged: true
 #    restart: always
     build: ./
     ports:
@@ -11,12 +11,13 @@ services:
 #    network_mode: bridge
     networks:
       - i40network
-    tty: true
+#    tty: true
 #    interactive: true
     volumes:
-      - /dev/bus/usb:/dev/bus/usb
+#      - /dev/bus/usb:/dev/bus/usb
 #      - /etc/cups:/etc/cups
 #      - /var/run/cups:/var/run/cups
+      - /var/run/cups/cups.sock:/var/run/cups/cups.sock
 networks:
     i40network:
         external:

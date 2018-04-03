@@ -12,12 +12,13 @@ RUN npm install
 
 # Install Printing Command
 RUN apt-get update
-RUN apt-get install -y cups
-RUN apt-get install -y cups-client
+#RUN apt-get install -y cups
+RUN apt-get install -y cups-client cups-bsd
 
 # Copy source code
 COPY . .
 
+#RUN mkdir ~/.cups
 COPY ./cups/client.conf /etc/cups/client.conf
 
 EXPOSE ${port}

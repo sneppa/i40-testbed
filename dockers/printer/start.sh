@@ -11,15 +11,17 @@ _term() {
 
 
 #echo "Cups starten"
-#service cups start
+#ervice cups start
 #echo "Admin:"
-#lpadmin -d MP190-series
+#lpadmin -d http://localhost:631/printers/MP190-series
 #lpstat -d
-#echo "lpstat:"
-#lpstat -p -d
+echo "lpstat:"
+lpstat -t
 #echo "LS:"
-#ls /etc
-#ping i40-VirtualBox
+#ls -lag /etc
+# ping localhost
+#lpr print_template.ps
+#lp print_template.ps
 
 trap _term SIGTERM
 
