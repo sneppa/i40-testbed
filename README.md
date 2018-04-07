@@ -3,6 +3,8 @@ Components for an Industrie 4.0 Testbed Prototype.
 
 Concept and prototype described in https://github.com/sneppa/thesis-template
 
+![Verwaltungsinterface](https://github.com/sneppa/thesis/blob/master/latex/tex/bilder/Interface.png)
+
 ## Components:
 - [Control Interface](https://github.com/sneppa/i40-testbed/tree/master/dockers/control)
 - [Discovery Server](https://github.com/sneppa/i40-testbed/tree/master/dockers/discovery)
