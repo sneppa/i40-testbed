@@ -83,6 +83,12 @@ var client = function Client(endpoint) {
 };
 
 
+/**
+ * Verbindung zum Server herstellen
+ * @param {opcUaClient} opcClient 
+ * @param {EndpointUrl} endpointUrl 
+ * @param {CallbackFunction} callback 
+ */
 function ConnectToServer(opcClient, endpointUrl, callback) {
     opcClient.connect(endpointUrl, function (err) {
         if (err) {
@@ -93,6 +99,12 @@ function ConnectToServer(opcClient, endpointUrl, callback) {
         callback(err);
     });
 }
+
+/**
+ * Erstellt einen Session mit dem Server
+ * @param {opcUaClient} opcClient 
+ * @param {CallbackFunction} callback 
+ */
 function CreateSession(opcClient, callback) {
     opcClient.createSession(function (err, sess) {
         if (err)
@@ -104,6 +116,15 @@ function CreateSession(opcClient, callback) {
         callback(sess, err);
     });
 }
+
+/**
+ * Ruft die Methode zum Status setzen beim Produkt auf
+ * @param {opcUaSession} session 
+ * @param {String} step 
+ * @param {String} status 
+ * @param {String} location 
+ * @param {CallbackFunction} callback 
+ */
 function callStatusMethod (session, step, status, location, callback) {
     
     console.log("Call Method setStatus with ["+step+","+status+"]");
