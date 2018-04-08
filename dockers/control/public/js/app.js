@@ -33,6 +33,8 @@ app.config(function ($routeProvider) {
         controller: 'networkdiagram',
     }).when('/help', {
         templateUrl: 'tpl/help.html',
+    }).when('/settings', {
+        templateUrl: 'tpl/settings.html',
     }).when('/log', {
         templateUrl: 'tpl/log.html',
         controller: 'log',

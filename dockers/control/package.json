@@ -4,8 +4,8 @@
         "description": "Control panel for an Industry 4.0 Testbed",
         "license": "MIT",
         "repository": {
-            "type": "git",
-            "url": "git://github.com/sneppa/i40-testbed.git"
+                "type": "git",
+                "url": "git://github.com/sneppa/i40-testbed.git"
         },
         "keywords": [
                 "util",
