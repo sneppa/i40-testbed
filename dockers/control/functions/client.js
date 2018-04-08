@@ -6,6 +6,10 @@ var endpointUrl;
 var session;
 
 var client = {
+    /**
+     * Server suchen
+     * @param {function} callback 
+     */
     findServers: function (callback) {
         ConnectToServer(config.discovery.url, function (err) {
             if (err) {
@@ -19,6 +23,11 @@ var client = {
             }
         });
     },
+
+    /**
+     * Session erstellen
+     * @param {function} callback 
+     */
     createSession: function (callback) {
         ConnectToServer(endpointUrl, function (err) {
             if (err) {
@@ -34,6 +43,10 @@ var client = {
             }
         });
     },
+
+    /**
+     * Beenden der Sitzung
+     */
     stopSession: function () {
         session.close(function (err) {
             opcClient.disconnect(function (err) {});
@@ -41,7 +54,12 @@ var client = {
     }
 };
 
-
+/**
+ * Verbindung zum Server herstellen
+ * @param {opcUaClient} opcClient 
+ * @param {EndpointUrl} endpointUrl 
+ * @param {CallbackFunction} callback 
+ */
 function ConnectToServer(endpointUrl, callback) {
     opcClient.connect(endpointUrl, function (err) {
         if (err) {
@@ -52,6 +70,12 @@ function ConnectToServer(endpointUrl, callback) {
         callback(err);
     });
 }
+
+/**
+ * Erstellt einen Session mit dem Server
+ * @param {opcUaClient} opcClient 
+ * @param {CallbackFunction} callback 
+ */
 function CreateSession(callback) {
     opcClient.createSession(function (err, sess) {
         if (err)

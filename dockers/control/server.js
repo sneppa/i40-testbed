@@ -184,35 +184,6 @@ MongoClient.connect(url, function (err, client) {
         });
     })
 
-    // Neues Produkt erstellen -> Ausgelagert auf Repo
-//    app.post('/api/product', function (req, res) {
-//        products.insert(req.body, function (err, records) {
-//            if (err == null)
-//                res.status(200);
-//            else
-//                res.status(500);
-//            res.send("");
-//        });
-//        logger(req.body);
-//    });
-
-    // Produkte abfragen -> Ausgelagert auf Repo
-//    app.get('/api/product', function (req, res) {
-//        products.find({}).toArray(function (err, result) {
-//            if (err == null)
-//            {
-//                res.status(200);
-//                res.send(result);
-//            } else
-//            {
-//                res.status(500);
-//                res.send("");
-//            }
-//            logger("Queried Product");
-//            logger(result);
-//        });
-//    });
-
     // Neuer Produkttyp erstellen
     app.post('/api/producttype', function (req, res) {
         producttypes.insert(req.body, function (err, records) {
@@ -280,15 +251,3 @@ MongoClient.connect(url, function (err, client) {
 logger = function (text) {
     console.log(text);
 };
-
-
-
-process.on('EXIT', function () { console.log("EXIT"); shutDown(); });
-process.on('SIGINT', function () { console.log("SIGINT"); shutDown(); });
-process.on('SIGTERM', function () { console.log("SIGTERM"); shutDown(); });
-//process.on('SIGKILL', shutDown);
-
-function shutDown()
-{
-    
-}
