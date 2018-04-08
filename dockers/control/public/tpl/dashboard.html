@@ -34,7 +34,7 @@
 
                     <div class="header">
                         <h4 class="title">Serververteilung</h4>
-                        <p class="category">Last Campaign Performance</p>
+                        <p class="category">OPC UA und Testbed Server</p>
                     </div>
                     <div class="content">
                         <div id="chartPreferences" class="ct-chart ct-perfect-fourth"></div>
@@ -49,13 +49,30 @@
                     </div>
                 </div>
             </div>
-            <div class="card">
-                <div class="header">
-                    <h4 class="title">Protokoll</h4>
-                    <p class="category">Die letzten 10 Nachrichten</p>
-                </div>
-                <div class="content">
-                    
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="header">
+                        <h4 class="title">Protokoll</h4>
+                        <p class="category">Die letzten 10 Nachrichten</p>
+                    </div>
+                    <div class="content">
+                        <table class="table table-hover table-striped">
+                            <thead>
+                                <tr><th>Server</th>
+                                    <th>Datum</th>
+                                    <th>Nachricht</th>
+                                    <th>Art</th>
+                                </tr></thead>
+                            <tbody>
+                                <tr ng-repeat="msg in logs | limitTo: 10">
+                                    <td>{{msg.server}}</td>
+                                    <td>{{msg.date}}</td>
+                                    <td>{{msg.msg}}</td>
+                                    <td>{{msg.type}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

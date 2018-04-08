@@ -46,15 +46,66 @@ app.controller('nav', function ($scope) {
 //    $scope.title = "Dashboard";
 });
 
-app.controller('dashboard', function ($scope) {
+app.controller('dashboard', function ($scope, $http) {
 //    $scope.nav.title = "Dashboard";
+
+    var dataPreferences = {
+        series: [
+            [25, 30, 20, 25]
+        ]
+    }
+
+    var optionsPreferences = {
+        donut: true,
+        donutWidth: 40,
+        startAngle: 0,
+        total: 100,
+        showLabel: false,
+        axisX: {
+            showGrid: false
+        }
+    };
 
     Chartist.Pie('#chartPreferences', dataPreferences, optionsPreferences);
 
-    Chartist.Pie('#chartPreferences', {
-      labels: ['62%','32%','6%'],
-      series: [62, 32, 6]
-    });
+    
+    $http.get('/api/network/server').then(
+        function (res) {
+            var products = 0;
+            var machines = 0;
+            var testbed = 2;
+            
+            res.data.forEach(function (item) {
+                if (item.productUri.substr(0,8) == "PRODUCT_")
+                    products++;
+                else
+                    machines++;
+            })
+
+            var sum = products + machines + testbed;
+            var percentProducts = Math.round(100 / sum * products);
+            var percentMachines = Math.round(100 / sum * machines);
+            var percentTestbed = Math.round(100 / sum * testbed);
+        
+            Chartist.Pie('#chartPreferences', {
+              labels: [percentProducts+'%',percentMachines+'%',percentTestbed+'%'],
+              series: [percentProducts, percentMachines, percentTestbed]
+            });
+        },
+        function (err) {
+            showError("Konnte Server nicht lesen!");
+            console.log(err);
+        });
+
+
+    $http.get('/api/log').then(
+        function (res) {
+            $scope.logs = res.data;
+        },
+        function (err) {
+            showError("Konnte Logs nicht laden!");
+            console.log(err);
+        });
 });
 
 app.controller('server', function ($scope, $http, $timeout) {
