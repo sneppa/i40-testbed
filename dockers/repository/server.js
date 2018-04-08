@@ -27,6 +27,7 @@ app.use(function (req, res, next) {
 
 logger("Server beenden mit CTRL + C".red);
 
+// Mit Datenbank verbinden
 mUtil.connectToServer( function( err ) {
 
     assert.equal(null, err);
@@ -36,6 +37,7 @@ mUtil.connectToServer( function( err ) {
     db = mUtil.getDb();
 //    console.log(db);
 
+    // Server mit Demo Daten oder normal starten
     if (config.demo)
     {
         initDemoDatabase(db);
@@ -269,31 +271,6 @@ function addVarToAdressspace(addressSpace, folder, variable, product, varName)
 
         return new opcua.Variant({dataType: toEnum(variable.type), value});
     };
-    /* Versuch eine Datenbank dran zu hängen.
-    var getMethod = function () {
-        logger("get: " + variable.name + " (" + product._id + ")");
-        
-        return mUtil.getProduct(""+product._id).then( (prod) => {
-            console.log(prod);
-            var value = "";
-
-            if (variable.name == "location")
-                value = prod.location;
-            else if (variable.name == "status")
-                value = prod.status;
-            else if (variable.name == "currentStep")
-                value = prod.currentStep;
-            else
-            {
-                prod.var.forEach(function (cvar) {
-                    if (cvar.name == variable.name)
-                    value = cvar.value;
-                })
-            }
-
-            return new opcua.Variant({dataType: toEnum(variable.type), value});
-        });
-    };*/
 
     var setMethod = null;
 
@@ -342,6 +319,13 @@ function addVarToAdressspace(addressSpace, folder, variable, product, varName)
     });
 }
 
+/**
+ * Neue Produktionsstufe in Addressraum hinzufügen
+ * @param {addressSpace} addressSpace 
+ * @param {Node} folder 
+ * @param {Integer} stepnr 
+ * @param {String} name 
+ */
 function addStepToAdressspace(addressSpace, folder, stepnr, name)
 {
 //    console.log("add step");
@@ -360,6 +344,12 @@ function addStepToAdressspace(addressSpace, folder, stepnr, name)
     });
 }
 
+/**
+ * Neue Methode dem addressSpace hinzufügen
+ * @param {addressSpace} addressSpace 
+ * @param {Node} folder 
+ * @param {product} product 
+ */
 function addMethodsToAdressspace(addressSpace, folder, product)
 {
         var amethod = addressSpace.addMethod(folder, {
@@ -544,7 +534,7 @@ function logger(text)
 }
 
 /**
- * 
+ * Initialisiert die Demodatenbank
  * @param {MongoDatabase} db
  */
 function initDemoDatabase(db)
@@ -582,6 +572,11 @@ process.on('SIGINT', function () {
     });
 });
 
+/**
+ * Gibt zurück, ob ein String im Array gespeichert ist.
+ * @param {String} needle zu findender String
+ * @param {Array} haystack StringArray
+ */
 function inArray(needle, haystack) {
     var length = haystack.length;
     for(var i = 0; i < length; i++) {

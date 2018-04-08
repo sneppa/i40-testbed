@@ -4,16 +4,28 @@ var MongoClient = mongodb.MongoClient;
 
 var _db;
 
+/**
+ * Datenbankschnittstelle
+ */
 module.exports = {
+    /**
+     * Mit Server verbinden
+     */
     connectToServer: function (callback) {
         MongoClient.connect(config.db.url, function (err, client) {
             _db = client.db(config.demo ? 'demorepo' : config.db.name);
             return callback(err);
         });
     },
+    /**
+     * Datenbank zurück geben
+     */
     getDb: function () {
         return _db;
     },
+    /**
+     * Produkte abfragen
+     */
     getProduct: async function (idproduct) {
         var products = _db.collection('products');
 
@@ -23,6 +35,9 @@ module.exports = {
 
         return await products.findOne({"_id": new mongodb.ObjectID(idproduct)});
     },
+    /**
+     * Produkt aktualisieren
+     */
     updateProduct: function (product, callback) {
         var products = _db.collection('products');
 //        console.log("Update: "+product.name);
@@ -34,6 +49,9 @@ module.exports = {
             callback(err, result);
         });
     },
+    /**
+     * Produkt löschen
+     */
     deleteProduct: function (idproduct, callback) {
         var products = _db.collection('products');
         console.log("Delete: "+idproduct);
