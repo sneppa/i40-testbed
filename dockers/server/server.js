@@ -23,6 +23,9 @@ server.serverInfo.productUri = config.productUri;
 
 var status = 'WAIT';
 
+/**
+ * Initialisieren des Adressraums
+ */
 function post_initialize() {
 
     var addressSpace = server.engine.addressSpace;
@@ -52,27 +55,31 @@ function post_initialize() {
 
         console.log("Init Method: " + method.name);
 
+        // Eingabeparameter der Methode setzen
         var inputArguments = [];
         method.inputArguments.forEach(function (arg) {
             inputArguments.push({'name': arg.name, description: {text: arg.description}, dataType: toEnum(arg.dataType)});
         });
 
+        // Ausgabeparameter der Methode setzen
         var outputArguments = [];
         method.outputArguments.forEach(function (arg) {
             outputArguments.push({'name': arg.name, description: {text: arg.description}, dataType: toEnum(arg.dataType), valueRank: 1});
         });
 
+        // Methode zu Adressbaum hinzufügen
         addressSpace.addMethod(myDevice, {
             browseName: method.name,
             nodeId: "ns=1;s="+method.name,
             inputArguments: inputArguments,
             outputArguments: outputArguments
         }).bindMethod(function (inputArguments, context, callback) {
+            // Methoden Ausführung hinzufügen
             method.method(inputArguments, status, function (err, dataType, output, statusRet) {
                 status = statusRet; // Status: WAIT bei Fehler | PRODUCING bei OK
             
                 console.log("Output generated: " + output);
-//
+
                 var callMethodResult = {
                     statusCode: opcua.StatusCodes.Good,
                     outputArguments: [{
@@ -92,25 +99,32 @@ function post_initialize() {
     });
 }
 
+// Adressraum dem Server hinzufügen
 server.initialize(post_initialize);
 
-if (config.discovery.enabled)
+if (config.discovery.enabled) 
 {
+    // Server beim Discovery Server registrieren
     server.registerServer(config.discovery.url, function () {
         console.log("Registered Server ("+server._get_endpoints()[0].endpointUrl+") to "+config.discovery.url);
     });
 }
 
+// Server starten
 server.start(function () {
     console.log("Server is now listening ... ( press CTRL+C to stop)");
     console.log(server._get_endpoints()[0].endpointUrl);
 });
 
+
+// Abfangen des Docker Herunterfahren Befehls
 process.on('EXIT', function () { console.log("EXIT"); shutDown(); });
 process.on('SIGINT', function () { console.log("SIGINT"); shutDown(); });
 process.on('SIGTERM', function () { console.log("SIGTERM"); shutDown(); });
-//process.on('SIGKILL', shutDown);
 
+/**
+ * Server ordnungsgemäß herunterfahren
+ */
 function shutDown()
 {
     if (config.discovery.enabled)
@@ -150,8 +164,4 @@ function toEnum(text)
             return opcua.DataType.Boolean;
             break;
     }
-}
-
-function sleep (time) {
-  return new Promise((resolve) => setTimeout(resolve, time));
 }
