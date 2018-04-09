@@ -29,7 +29,7 @@
                                     <td><span class="btn btn-default btn-sm btn-round" ng-repeat="var in product.var" style="margin-right: 5px;">{{var.name}}: ({{var.value}})</span></td>
                                     <td>{{product.location}}</td>
                                     <td>{{product.status}}</td>
-                                    <td>{{100/product.step.length*product.currentStep+(product.status=='PRODUCE'?100/product.step.length/2:0)+(product.status=='FINISHED'||product.status=='PRODUCED'?100/product.step.length:0)}}%</td>
+                                    <td>{{100/product.step.length*product.currentStep+(product.status=='PRODUCE'?100/product.step.length/2:0)+(product.status=='FINISHED'||product.status=='PRODUCED'?100/product.step.length:0) | number: 2}}%</td>
                                     <td>
                                         <span ng-if="product.status == 'INIT'">
                                             <span class="btn btn-primary btn-sm btn-round" title="produzieren" ng-click="startProduct(product)"><i class="pe-7s-play"></i></span>
